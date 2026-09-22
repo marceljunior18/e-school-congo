@@ -1,0 +1,3447 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-School — Plateforme Éducative d'Excellence</title>
+  
+  <!-- SEO & Métadonnées -->
+  <meta name="description" content="E-School : plateforme SaaS éducative d'excellence au Congo et en Afrique Centrale. +5 000 exercices interactifs, simulations du Bac, tutorat IA et tableau de bord en direct." />
+  <meta name="author" content="E-School Technologies" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#F0F5FF',
+              100: '#E0EBFF',
+              500: '#2F6FED',
+              600: '#255ED4',
+              700: '#1E4FD1',
+            },
+            dark: '#1A1D29',
+            surface: '#F7F8FA',
+            success: {
+              DEFAULT: '#22C55E',
+              light: '#E8F8EE',
+            },
+            accent: {
+              DEFAULT: '#F5A623',
+              light: '#FEF6E7',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18 & Babel Standalone -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Styles personnalisés pour micro-animations et survol -->
+  <style>
+    body {
+      background-color: #F7F8FA;
+      color: #1A1D29;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    /* Animation au survol des boutons */
+    .btn-hover {
+      transition: all 0.2s ease-in-out !important;
+    }
+    .btn-hover:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 24px -8px rgba(47, 111, 237, 0.28);
+    }
+    .btn-hover:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    /* Animation au survol des cartes */
+    .card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px -10px rgba(15, 23, 42, 0.09);
+    }
+
+    /* Animation d'apparition douce */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Custom scrollbar discrète */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
+</head>
+<body class="bg-[#F7F8FA] min-h-screen text-[#1A1D29]">
+  
+  <div id="root"></div>
+
+  <!-- Script React + Babel entièrement autonome -->
+  <script type="text/babel">
+    const { useState } = React;
+
+    // 1. COMPOSANT HEADER AVEC MARCEL JUNIOR (IMAGE 2) & AUTO-LAYOUT
+    function Header({ activeTab, setActiveTab, onNavigate, auth, onLogout }) {
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      const navLinks = [
+        { id: 'hero', label: 'Accueil', target: null },
+        { id: 'dashboard', label: 'Tableau de bord', target: 'dashboard-section' },
+        { id: 'features', label: 'Fonctionnalités', target: 'features-section' },
+        { id: 'pricing', label: 'Tarifs (FCFA)', target: 'pricing-section' },
+        { id: 'testimonials', label: 'Réussites', target: 'testimonials-section' },
+        { id: 'faq', label: 'FAQ', target: 'faq-section' }
+      ];
+
+      const handleNavClick = (item) => {
+        setActiveTab(item.id);
+        setMobileMenuOpen(false);
+        if (item.target) {
+          const el = document.getElementById(item.target);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      };
+
+      return (
+        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 transition-all duration-200 shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              
+              {/* Logo E-School */}
+              <div
+                onClick={() => {
+                  if (onNavigate) onNavigate('landing');
+                  handleNavClick(navLinks[0]);
+                }}
+                className="flex items-center gap-3 cursor-pointer group"
+              >
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2F6FED] to-[#1E4FD1] flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200">
+                  <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-2xl font-black tracking-tight text-[#1A1D29]">E-School</span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-[#E8F8EE] text-[#22C55E]">SaaS</span>
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-400 hidden sm:block">Plateforme d'Excellence Éducative</p>
+                </div>
+              </div>
+
+              {/* Navigation Principale */}
+              <nav className="hidden lg:flex items-center bg-slate-50/90 p-1.5 rounded-2xl border border-slate-200/60 shadow-inner">
+                {navLinks.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item)}
+                      className={`relative px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                        isActive
+                          ? 'bg-white text-[#2F6FED] shadow-sm shadow-slate-200/80 font-bold'
+                          : 'text-slate-500 hover:text-[#1A1D29] hover:bg-slate-100/60'
+                      }`}
+                    >
+                      {item.label}
+                      {isActive && (
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#2F6FED]"></span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+
+              {/* Profil & Actions Droite (Auto-Layout Moderne) */}
+              <div className="flex items-center gap-3 sm:gap-4">
+                
+                {/* Badge Abonnement en FCFA */}
+                <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                  <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+                  <span className="text-xs font-semibold text-slate-600">Formule Pro :</span>
+                  <span className="text-xs font-bold text-[#1E4FD1]">15 000 FCFA<span className="font-normal text-slate-500">/mois</span></span>
+                </div>
+
+                {/* Bouton Notifications */}
+                <button
+                  title="Notifications"
+                  className="relative p-2.5 rounded-xl text-slate-500 hover:text-[#1A1D29] hover:bg-slate-100 transition-all duration-200 btn-hover hidden sm:block"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#F5A623] border-2 border-white rounded-full"></span>
+                </button>
+
+                {/* Profil Utilisateur AUTO-LAYOUT avec Marcel Junior (Image 2) */}
+                <div
+                  onClick={() => onNavigate && onNavigate(auth && auth.isAuthenticated ? 'app-dashboard' : 'login')}
+                  title={auth && auth.isAuthenticated ? "Accéder au tableau de bord" : "Se connecter"}
+                  className="flex items-center gap-3 pl-2 sm:pl-3 sm:border-l sm:border-slate-200 py-1 pr-1.5 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
+                >
+                  <div className="relative w-10 h-10 rounded-2xl overflow-hidden ring-2 ring-blue-100 shadow-sm shrink-0">
+                    <img
+                      src="assets/images/marcel-junior.jpg"
+                      alt="Marcel Junior"
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-200"
+                    />
+                    <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${auth && auth.isAuthenticated ? 'bg-[#22C55E]' : 'bg-slate-300'} border-2 border-white rounded-full`}></span>
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left justify-center">
+                    <div className="text-sm font-bold text-[#1A1D29] group-hover:text-[#2F6FED] transition-colors leading-tight">
+                      {auth && auth.user ? auth.user.name : 'Marcel Junior'}
+                    </div>
+                    <div className="text-[11px] font-semibold text-slate-400 mt-0.5">
+                      {auth && auth.isAuthenticated ? 'Élève Connecté • Espace Pro' : 'Terminale C • Brazzaville 🇨🇬'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bouton Connexion */}
+                <button
+                  onClick={() => onNavigate && onNavigate('login')}
+                  className="hidden sm:inline-flex items-center px-3.5 py-2 rounded-xl text-slate-700 hover:text-[#2F6FED] hover:bg-slate-100/70 text-xs font-bold transition-all cursor-pointer btn-hover"
+                >
+                  Connexion
+                </button>
+
+                {/* Bouton CTA */}
+                <button
+                  onClick={() => {
+                    if (onNavigate) {
+                      onNavigate('signup');
+                    } else {
+                      const el = document.getElementById('pricing-section');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs font-bold shadow-sm shadow-blue-500/20 btn-hover"
+                >
+                  Essai Gratuit
+                </button>
+
+                {/* Menu Mobile */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+
+              </div>
+            </div>
+
+            {/* Menu Mobile */}
+            {mobileMenuOpen && (
+              <div className="lg:hidden py-3 border-t border-slate-100 animate-fadeInUp">
+                <div className="flex flex-col gap-1">
+                  {navLinks.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item)}
+                      className={`px-4 py-2.5 rounded-xl text-left text-sm font-semibold transition-colors ${
+                        activeTab === item.id
+                          ? 'bg-blue-50 text-[#2F6FED] font-bold'
+                          : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                  
+                  {/* Carte Profil Mobile Auto-Layout */}
+                  <div
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onNavigate && onNavigate(auth && auth.isAuthenticated ? 'app-dashboard' : 'login');
+                    }}
+                    className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between px-3 py-2 bg-slate-50 rounded-xl cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <img
+                        src="assets/images/marcel-junior.jpg"
+                        alt="Marcel Junior"
+                        className="w-9 h-9 rounded-xl object-cover object-top ring-1 ring-blue-200"
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-[#1A1D29]">
+                          {auth && auth.user ? auth.user.name : 'Marcel Junior'}
+                        </div>
+                        <div className="text-[10px] text-slate-500">
+                          {auth && auth.isAuthenticated ? 'Élève Connecté' : 'Terminale C • Brazzaville 🇨🇬'}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-[#1E4FD1]">15 000 FCFA/mois</span>
+                  </div>
+
+                  {/* Actions Connexion / Inscription Mobile */}
+                  <div className="mt-2 pt-2 border-t border-slate-100 flex flex-col gap-2">
+                    <button
+                      onClick={() => { setMobileMenuOpen(false); onNavigate && onNavigate('login'); }}
+                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-[#2F6FED] bg-blue-50 hover:bg-blue-100 transition-colors flex items-center justify-between"
+                    >
+                      <span>Se connecter à mon compte élève</span>
+                      <span>→</span>
+                    </button>
+                    <button
+                      onClick={() => { setMobileMenuOpen(false); onNavigate && onNavigate('signup'); }}
+                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] shadow-sm flex items-center justify-center gap-1.5"
+                    >
+                      <span>Créer un compte élève</span>
+                      <span>✨</span>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+          </div>
+        </header>
+      );
+    }
+
+    // 2. COMPOSANT HERO AVEC L'IMAGE 3 EN FOND SUBTIL
+    function Hero() {
+      const scrollToDashboard = () => {
+        const el = document.getElementById('dashboard-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      const scrollToPricing = () => {
+        const el = document.getElementById('pricing-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      return (
+        <section className="relative overflow-hidden pt-12 pb-16 lg:pt-20 lg:pb-24 bg-[#F7F8FA]">
+          
+          {/* FOND SUBTIL AVEC L'IMAGE 3 (Drapé Satin Congo) en filigrane doux */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-15 mix-blend-multiply bg-cover bg-center transition-opacity duration-700"
+            style={{ backgroundImage: "url('assets/images/congo-bg.jpg')" }}
+          ></div>
+
+          {/* Dégradé doux de superposition pour une lisibilité parfaite */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/80 to-[#F7F8FA] pointer-events-none"></div>
+
+          {/* Cercles diffus */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 pointer-events-none overflow-hidden">
+            <div className="absolute -top-32 left-1/4 w-96 h-96 bg-blue-100/40 rounded-full blur-3xl"></div>
+            <div className="absolute top-10 right-1/4 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl"></div>
+          </div>
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto">
+              
+              {/* Badge Annonce */}
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-blue-200/80 shadow-xs mb-6 backdrop-blur-md animate-fadeInUp">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]"></span>
+                </span>
+                <span className="text-xs font-bold text-[#1E4FD1]">
+                  🇨🇬 E-School 2.0 • Conforme aux programmes officiels & Baccalauréat
+                </span>
+              </div>
+
+              {/* Titre Principal H1 */}
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-[#1A1D29] tracking-tight leading-[1.15] sm:leading-[1.12] mb-6">
+                L'Excellence Scolaire & la{' '}
+                <span className="bg-gradient-to-r from-[#2F6FED] via-[#255ED4] to-[#1E4FD1] bg-clip-text text-transparent">
+                  Réussite aux Examens
+                </span>{' '}
+                à Portée de Main
+              </h1>
+
+              {/* Sous-titre */}
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto mb-8 font-normal">
+                La plateforme SaaS éducative tout-en-un pour lycéens, collégiens et parents au Congo et en Afrique Centrale. Révisez avec plus de <strong className="text-[#1A1D29]">5 000 exercices corrigés</strong>, des simulations réelles du Bac et un suivi personnalisé en temps réel.
+              </p>
+
+              {/* Boutons d'Action (Dual CTA) */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                <button
+                  onClick={scrollToPricing}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-500/25 btn-hover group"
+                >
+                  <span>Commencer l'essai gratuit (0 FCFA)</span>
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={scrollToDashboard}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white text-slate-700 font-bold text-sm sm:text-base border border-slate-200 shadow-sm hover:border-blue-200 hover:bg-slate-50/80 btn-hover group"
+                >
+                  <svg className="w-5 h-5 text-[#2F6FED] group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  <span>Explorer le Dashboard interactif</span>
+                </button>
+              </div>
+
+              {/* Réassurance */}
+              <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs text-slate-500 mb-12">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[#22C55E] font-bold">✓</span>
+                  <span>Sans carte bancaire requise</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[#22C55E] font-bold">✓</span>
+                  <span>Conforme aux programmes nationaux</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[#22C55E] font-bold">✓</span>
+                  <span>Formule dès <strong className="text-[#1A1D29]">15 000 FCFA/mois</strong></span>
+                </div>
+              </div>
+
+              {/* Preuves Sociales */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
+                <div className="p-5 rounded-2xl bg-white/95 border border-slate-100 shadow-sm shadow-slate-200/50 card-hover flex items-center gap-4 backdrop-blur-xs">
+                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#2F6FED] flex items-center justify-center font-black text-xl shrink-0">🎓</div>
+                  <div>
+                    <div className="text-2xl font-extrabold text-[#1A1D29] tracking-tight">+25 000</div>
+                    <div className="text-xs text-slate-500 font-medium">Élèves actifs accompagnés</div>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white/95 border border-slate-100 shadow-sm shadow-slate-200/50 card-hover flex items-center gap-4 backdrop-blur-xs">
+                  <div className="w-12 h-12 rounded-xl bg-[#E8F8EE] text-[#22C55E] flex items-center justify-center font-black text-xl shrink-0">📈</div>
+                  <div>
+                    <div className="text-2xl font-extrabold text-[#1A1D29] tracking-tight">94.8%</div>
+                    <div className="text-xs text-slate-500 font-medium">Taux de réussite au Bac</div>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white/95 border border-slate-100 shadow-sm shadow-slate-200/50 card-hover flex items-center gap-4 backdrop-blur-xs">
+                  <div className="w-12 h-12 rounded-xl bg-[#FEF6E7] text-[#F5A623] flex items-center justify-center font-black text-xl shrink-0">⭐</div>
+                  <div>
+                    <div className="text-2xl font-extrabold text-[#1A1D29] tracking-tight">4.9 / 5</div>
+                    <div className="text-xs text-slate-500 font-medium">1 450+ avis certifiés</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="mt-16 text-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/90 border border-slate-200/70 text-slate-600 text-xs font-bold uppercase tracking-wider mb-3 shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+                Démonstration Produit en Direct
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-[#1A1D29] tracking-tight">
+                Découvrez votre Espace de Travail E-School
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto mt-1">
+                Chaque élève dispose d'un tableau de bord sur-mesure pour mesurer son avancement et combler ses lacunes.
+              </p>
+            </div>
+
+          </div>
+        </section>
+      );
+    }
+
+    // 3. COMPOSANT DASHBOARD HEADER
+    function DashboardHeader() {
+      const [selectedPeriod, setSelectedPeriod] = useState('trimestre1');
+
+      return (
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 pt-2">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1A1D29] tracking-tight">
+                Aperçu du Tableau de bord
+              </h1>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-[#2F6FED] border border-blue-100">
+                Session Active
+              </span>
+            </div>
+            <p className="text-sm text-slate-500 max-w-2xl">
+              Visualisez rapidement vos progrès, vos points d'excellence et les axes d'amélioration prioritaires.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 self-start md:self-auto">
+            <div className="relative">
+              <select
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+                className="appearance-none bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl pl-3.5 pr-8 py-2.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED] cursor-pointer hover:border-slate-300 transition-colors"
+              >
+                <option value="trimestre1">Trimestre 1 (En cours)</option>
+                <option value="trimestre2">Trimestre 2</option>
+                <option value="annuel">Bilan Annuel 2026</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+
+            <button
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-[#2F6FED] text-xs sm:text-sm font-bold shadow-sm hover:shadow-md hover:border-blue-300 btn-hover group"
+            >
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2F6FED] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2F6FED]"></span>
+              </span>
+              <svg className="w-4 h-4 text-[#2F6FED] group-hover:rotate-12 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Assistant IA E-School</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // 4. COMPOSANT STAT CARDS
+    function StatCards() {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-7 animate-fadeInUp">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#2F6FED] via-[#255ED4] to-[#1E4FD1] text-white p-6 shadow-md shadow-blue-500/20 card-hover flex flex-col justify-between min-h-[190px]">
+            <div className="absolute -right-8 -bottom-10 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+            <div className="absolute right-4 top-4 w-28 h-28 rounded-full border border-white/15 pointer-events-none"></div>
+            <div className="absolute -right-4 top-10 w-20 h-20 rounded-full border border-white/10 pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-blue-100 uppercase tracking-wider">
+                  Moyenne des 5 derniers examens
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 backdrop-blur-sm text-white border border-white/20">
+                  Top 5%
+                </span>
+              </div>
+              <div className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-1">
+                86.5<span className="text-2xl sm:text-3xl font-bold text-blue-200">%</span>
+              </div>
+              <p className="text-xs text-blue-100 mt-1">
+                +3.2% par rapport au trimestre précédent
+              </p>
+            </div>
+
+            <div className="relative z-10 pt-4">
+              <button
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white text-xs sm:text-sm font-bold transition-all duration-200 border border-white/25 shadow-sm btn-hover group"
+              >
+                <span>S'entraîner maintenant</span>
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 card-hover flex flex-col justify-between min-h-[190px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Performance Globale
+                </span>
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#2F6FED] flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#1A1D29] tracking-tight mt-2">
+                78<span className="text-xl font-bold text-slate-400">%</span>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100">
+              <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                <span className="w-2 h-2 rounded-full bg-[#2F6FED]"></span>
+                <span>Point à renforcer :</span>
+                <span className="font-semibold text-[#1A1D29]">Algèbre & Fonctions</span>
+              </div>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="inline-flex items-center text-[11px] font-semibold text-[#22C55E]">
+                  ↑ +4.8%
+                </span>
+                <span className="text-[11px] text-slate-400">cette semaine</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 card-hover flex flex-col justify-between min-h-[190px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Modules Validés
+                </span>
+                <div className="w-9 h-9 rounded-xl bg-[#E8F8EE] text-[#22C55E] flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#1A1D29] tracking-tight mt-2">
+                18
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-slate-500">Progression globale</span>
+                <span className="font-bold text-[#22C55E]">75% (18/24)</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full rounded-full bg-[#22C55E] w-3/4 transition-all duration-500"></div>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2">Certifications obtenues avec mention</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 card-hover flex flex-col justify-between min-h-[190px]">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  En Cours d'Étude
+                </span>
+                <div className="w-9 h-9 rounded-xl bg-[#FEF6E7] text-[#F5A623] flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="9" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 3" />
+                  </svg>
+                </div>
+              </div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#1A1D29] tracking-tight mt-2">
+                04
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100">
+              <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                <span className="w-2 h-2 rounded-full bg-[#F5A623] animate-pulse"></span>
+                <span>Prochaine séance :</span>
+                <span className="font-semibold text-[#1A1D29]">Physique Ondes</span>
+              </div>
+              <div className="mt-1 flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">Échéance : Demain 14h</span>
+                <span className="text-[11px] font-bold text-[#F5A623]">2 devoirs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 5. COMPOSANT SUBJECT PERFORMANCE CHART
+    function SubjectChart() {
+      const [hoveredSubject, setHoveredSubject] = useState(null);
+
+      const subjects = [
+        { name: 'Mathématiques', short: 'Maths', attempts: 180, correct: 154, rate: '85%' },
+        { name: 'Physique-Chimie', short: 'Physique', attempts: 140, correct: 112, rate: '80%' },
+        { name: 'Sciences de la Vie', short: 'SVT', attempts: 160, correct: 138, rate: '86%' },
+        { name: 'Français & Lettres', short: 'Français', attempts: 210, correct: 172, rate: '82%' },
+        { name: 'Anglais LV1', short: 'Anglais', attempts: 230, correct: 202, rate: '88%' },
+        { name: 'Informatique & Algorithmes', short: 'Informatique', attempts: 170, correct: 145, rate: '85%' },
+        { name: 'Philosophie', short: 'Philo', attempts: 120, correct: 92, rate: '76%' },
+        { name: 'Histoire-Géographie', short: 'Histoire-Géo', attempts: 190, correct: 165, rate: '87%' },
+      ];
+
+      const maxVal = 250;
+
+      return (
+        <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-between h-full">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-[#1A1D29]">
+                Aperçu des performances par matière
+              </h2>
+              <p className="text-xs text-slate-400">
+                Comparatif des exercices réalisés et du taux de précision
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-[#2F6FED]"></span>
+                <span className="text-slate-600">Tentatives totales</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-[#22C55E]"></span>
+                <span className="text-slate-600">Réponses correctes</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative pt-6 pb-2">
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-40">
+              <div className="border-b border-dashed border-slate-200 w-full"></div>
+              <div className="border-b border-dashed border-slate-200 w-full"></div>
+              <div className="border-b border-dashed border-slate-200 w-full"></div>
+              <div className="border-b border-slate-200 w-full"></div>
+            </div>
+
+            <div className="relative z-10 grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-4 h-64 items-end px-2">
+              {subjects.map((sub, idx) => {
+                const totalHeight = (sub.attempts / maxVal) * 100;
+                const correctHeight = (sub.correct / sub.attempts) * 100;
+                const isHovered = hoveredSubject === idx;
+
+                return (
+                  <div
+                    key={sub.name}
+                    className="flex flex-col items-center h-full justify-end group cursor-pointer"
+                    onMouseEnter={() => setHoveredSubject(idx)}
+                    onMouseLeave={() => setHoveredSubject(null)}
+                  >
+                    {isHovered && (
+                      <div className="absolute -top-7 bg-[#1A1D29] text-white text-[11px] py-1.5 px-3 rounded-xl shadow-xl z-20 animate-fadeInUp pointer-events-none whitespace-nowrap">
+                        <div className="font-bold">{sub.name}</div>
+                        <div className="text-blue-300">Total : {sub.attempts} questions</div>
+                        <div className="text-green-300">Réussite : {sub.correct} ({sub.rate})</div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`w-8 sm:w-11 rounded-2xl p-1 bg-slate-100/70 flex flex-col justify-end transition-all duration-300 ${
+                        isHovered ? 'ring-2 ring-[#2F6FED] scale-105' : ''
+                      }`}
+                      style={{ height: `${totalHeight}%` }}
+                    >
+                      <div className="w-full rounded-t-xl bg-[#2F6FED] flex-1 transition-all duration-300"></div>
+                      <div
+                        className="w-full rounded-b-xl rounded-t-lg bg-[#22C55E] transition-all duration-300"
+                        style={{ height: `${correctHeight}%` }}
+                      ></div>
+                    </div>
+
+                    <span className={`text-[11px] sm:text-xs font-semibold mt-3 text-center transition-colors line-clamp-1 ${
+                      isHovered ? 'text-[#2F6FED] font-bold' : 'text-slate-500'
+                    }`}>
+                      {sub.short}
+                    </span>
+
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {sub.rate}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs text-slate-500">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+              <span>Précision moyenne globale : <strong className="text-[#1A1D29]">84.6%</strong> de bonnes réponses</span>
+            </div>
+            <span className="text-[11px] text-slate-400 mt-1 sm:mt-0">Basé sur 1 400 exercices validés</span>
+          </div>
+        </div>
+      );
+    }
+
+    // 6. COMPOSANT QUESTION DONUT SUMMARY
+    function QuestionDonut() {
+      const [tab, setTab] = useState('overall');
+
+      const data = tab === 'overall' ? {
+        total: 840,
+        correct: { count: 680, percent: 81, color: '#2F6FED', label: 'Correctes' },
+        wrong: { count: 100, percent: 12, color: '#F5A623', label: 'À réviser' },
+        skipped: { count: 60, percent: 7, color: '#CBD5E1', label: 'Non traitées' }
+      } : {
+        total: 150,
+        correct: { count: 130, percent: 87, color: '#2F6FED', label: 'Correctes' },
+        wrong: { count: 14, percent: 9, color: '#F5A623', label: 'À réviser' },
+        skipped: { count: 6, percent: 4, color: '#CBD5E1', label: 'Non traitées' }
+      };
+
+      const radius = 62;
+      const circ = 2 * Math.PI * radius;
+      
+      const correctStroke = (data.correct.percent / 100) * circ;
+      const wrongStroke = (data.wrong.percent / 100) * circ;
+      const skippedStroke = (data.skipped.percent / 100) * circ;
+
+      const correctOffset = 0;
+      const wrongOffset = -correctStroke;
+      const skippedOffset = -(correctStroke + wrongStroke);
+
+      return (
+        <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-between h-full">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-[#1A1D29]">
+                Synthèse des questions
+              </h2>
+            </div>
+
+            <div className="flex p-1 bg-slate-100/80 rounded-xl mb-6">
+              <button
+                onClick={() => setTab('overall')}
+                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${
+                  tab === 'overall'
+                    ? 'bg-white text-[#1A1D29] shadow-sm'
+                    : 'text-slate-500 hover:text-[#1A1D29]'
+                }`}
+              >
+                Global
+              </button>
+              <button
+                onClick={() => setTab('recent')}
+                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${
+                  tab === 'recent'
+                    ? 'bg-white text-[#1A1D29] shadow-sm'
+                    : 'text-slate-500 hover:text-[#1A1D29]'
+                }`}
+              >
+                5 Derniers Tests
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center my-3 relative">
+            <div className="relative w-44 h-44 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r={radius} fill="transparent" stroke="#F1F5F9" strokeWidth="20" />
+                <circle cx="80" cy="80" r={radius} fill="transparent" stroke="#2F6FED" strokeWidth="20" strokeDasharray={`${correctStroke} ${circ}`} strokeDashoffset={correctOffset} strokeLinecap="round" className="transition-all duration-700 ease-out" />
+                <circle cx="80" cy="80" r={radius} fill="transparent" stroke="#F5A623" strokeWidth="20" strokeDasharray={`${wrongStroke} ${circ}`} strokeDashoffset={wrongOffset} strokeLinecap="round" className="transition-all duration-700 ease-out" />
+                <circle cx="80" cy="80" r={radius} fill="transparent" stroke="#CBD5E1" strokeWidth="20" strokeDasharray={`${skippedStroke} ${circ}`} strokeDashoffset={skippedOffset} strokeLinecap="round" className="transition-all duration-700 ease-out" />
+              </svg>
+
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-3xl font-extrabold text-[#1A1D29] tracking-tight">{data.total}</span>
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Questions</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2.5 pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#2F6FED]"></span>
+                <span className="font-medium text-slate-600">Réponses correctes</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-[#1A1D29]">
+                <span>{data.correct.count}</span>
+                <span className="text-slate-400 text-[11px] font-semibold">({data.correct.percent}%)</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#F5A623]"></span>
+                <span className="font-medium text-slate-600">Points à réviser</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-[#1A1D29]">
+                <span>{data.wrong.count}</span>
+                <span className="text-slate-400 text-[11px] font-semibold">({data.wrong.percent}%)</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#CBD5E1]"></span>
+                <span className="font-medium text-slate-600">Questions ignorées</span>
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-[#1A1D29]">
+                <span>{data.skipped.count}</span>
+                <span className="text-slate-400 text-[11px] font-semibold">({data.skipped.percent}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 7. COMPOSANT RECENT EXAMS RESULT
+    function RecentExamsTable() {
+      const exams = [
+        { title: 'Bac Blanc — Épreuve Complète de Mathématiques', type: 'Épreuve Nationale Type C', questions: 100, date: '16/09/2026', previous: '84%', duration: '2h 15', score: 92, color: '#22C55E' },
+        { title: 'Physique & Chimie — Ondes & Électromagnétisme', type: 'Évaluation Trimestrielle', questions: 80, date: '12/09/2026', previous: '71%', duration: '1h 45', score: 84, color: '#22C55E' },
+        { title: 'SVT — Génétique & Régulation Immunitaire', type: 'Devoir Surveillé N°2', questions: 60, date: '08/09/2026', previous: '65%', duration: '1h 30', score: 76, color: '#2F6FED' },
+        { title: 'Informatique & Algorithmique — Récursivité & Arbres', type: 'TP Noté sur Plateforme', questions: 40, date: '04/09/2026', previous: '50%', duration: '0h 50', score: 68, color: '#F5A623' }
+      ];
+
+      return (
+        <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-between h-full">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#1A1D29]">Résultats récents aux examens</h2>
+              <p className="text-xs text-slate-400">Historique détaillé des dernières épreuves passées</p>
+            </div>
+            <button className="px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:text-[#2F6FED] hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-200 btn-hover">
+              Voir plus
+            </button>
+          </div>
+
+          <div className="overflow-x-auto -mx-6 px-6">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th className="pb-3 pr-4 font-semibold">Examen / Module</th>
+                  <th className="pb-3 px-3 font-semibold text-center">Questions</th>
+                  <th className="pb-3 px-3 font-semibold">Date</th>
+                  <th className="pb-3 px-3 font-semibold text-center">Précédent</th>
+                  <th className="pb-3 px-3 font-semibold text-center">Durée</th>
+                  <th className="pb-3 pl-3 font-semibold min-w-[130px]">Score</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100/70 text-xs">
+                {exams.map((item, index) => (
+                  <tr key={index} className="hover:bg-slate-50/80 transition-colors group">
+                    <td className="py-3.5 pr-4">
+                      <div className="font-bold text-[#1A1D29] group-hover:text-[#2F6FED] transition-colors line-clamp-1">{item.title}</div>
+                      <div className="text-[11px] text-slate-400 font-medium">{item.type}</div>
+                    </td>
+                    <td className="py-3.5 px-3 text-center font-medium text-slate-600">{item.questions}</td>
+                    <td className="py-3.5 px-3 text-slate-500 whitespace-nowrap font-medium">{item.date}</td>
+                    <td className="py-3.5 px-3 text-center">
+                      <span className="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-bold">{item.previous}</span>
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-500 font-medium">{item.duration}</td>
+                    <td className="py-3.5 pl-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-20 bg-slate-100 h-2 rounded-full overflow-hidden flex-1">
+                          <div className="h-full rounded-full transition-all duration-700" style={{ width: `${item.score}%`, backgroundColor: item.color }}></div>
+                        </div>
+                        <span className="font-extrabold text-[#1A1D29] text-xs w-8 text-right">{item.score}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span className="text-[11px] text-slate-400">Affichage de 4 sur 28 épreuves</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-medium text-slate-500">Bourse d'Excellence active :</span>
+              <span className="text-[11px] font-bold text-[#22C55E] bg-[#E8F8EE] px-2 py-0.5 rounded-md">
+                +50 000 FCFA débloqués
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 8. COMPOSANT TOP PERFORMERS AVEC MARCEL JUNIOR (IMAGE 2)
+    function TopPerformers() {
+      const students = [
+        { rank: 1, name: 'Marcel Junior', class: 'Terminale C • Brazzaville 🇨🇬', score: '96.5%', trend: '+4', avatar: 'assets/images/marcel-junior.jpg', medal: '🥇', medalBg: 'bg-amber-50 text-amber-600 border-amber-200' },
+        { rank: 2, name: 'Kouassi Yao', class: 'Terminale D • Collège Moderne', score: '94.2%', trend: '+3', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80', medal: '🥈', medalBg: 'bg-slate-100 text-slate-600 border-slate-200' },
+        { rank: 3, name: 'Fatou Traoré', class: 'Première C • Lycée d\'Excellence', score: '91.8%', trend: '+5', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80', medal: '🥉', medalBg: 'bg-orange-50 text-orange-600 border-orange-200' },
+        { rank: 4, name: 'Moussa Koné', class: 'Terminale C • Établissement Saint-Jean', score: '89.0%', trend: '+2', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80', medal: '4', medalBg: 'bg-slate-50 text-slate-500 border-slate-200' },
+        { rank: 5, name: 'Grace Mensah', class: 'Terminale A1 • Institut Blaise Pascal', score: '88.4%', trend: '-1', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80', medal: '5', medalBg: 'bg-slate-50 text-slate-500 border-slate-200' }
+      ];
+
+      return (
+        <div className="rounded-2xl bg-white p-6 border border-slate-100 shadow-sm shadow-slate-200/50 flex flex-col justify-between h-full">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-lg font-bold text-[#1A1D29]">Meilleurs élèves</h2>
+              <p className="text-xs text-slate-400">Top 5 de la promotion inter-établissements</p>
+            </div>
+            <button className="px-3.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:text-[#2F6FED] hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-200 btn-hover">
+              Classement
+            </button>
+          </div>
+
+          <div className="space-y-3.5">
+            {students.map((st) => (
+              <div key={st.rank} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50/80 transition-all duration-200 group">
+                <div className="flex items-center gap-3">
+                  <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold border ${st.medalBg}`}>{st.medal}</div>
+                  <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-1 ring-slate-200 shadow-xs shrink-0">
+                    <img src={st.avatar} alt={st.name} className="w-full h-full object-cover object-top" />
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold text-[#1A1D29] group-hover:text-[#2F6FED] transition-colors leading-tight">{st.name}</div>
+                    <div className="text-[11px] text-slate-400 font-medium">{st.class}</div>
+                  </div>
+                </div>
+
+                <div className="text-right flex items-center gap-3">
+                  <div>
+                    <div className="text-xs sm:text-sm font-extrabold text-[#1A1D29]">{st.score}</div>
+                    <div className="text-[10px] text-slate-400">Score global</div>
+                  </div>
+                  <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg text-[11px] font-bold ${st.trend.startsWith('+') ? 'bg-[#E8F8EE] text-[#22C55E]' : 'bg-slate-100 text-slate-500'}`}>
+                    {st.trend.startsWith('+') ? '↑' : '↓'} {st.trend.replace('+', '').replace('-', '')}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span className="text-slate-400">Prix d'Excellence Semestriel</span>
+            <span className="font-bold text-[#1E4FD1]">Prix : 100 000 FCFA</span>
+          </div>
+        </div>
+      );
+    }
+
+    // 9. COMPOSANT FEATURES
+    function Features() {
+      const features = [
+        { icon: '🧠', tag: 'Tutorat IA', tagBg: 'bg-blue-50 text-[#2F6FED]', title: 'Correction Intelligente Étape par Étape', description: 'Notre assistant IA analyse vos réponses, décortique les démarches de calcul et vous explique précisément la règle mathématique ou scientifique à appliquer.' },
+        { icon: '🎯', tag: 'Examens Officiels', tagBg: 'bg-[#E8F8EE] text-[#22C55E]', title: 'Simulations Réelles du Bac & BEPC', description: 'Accédez à plus de 10 ans d\'annales officielles corrigées selon le barème des examinateurs nationaux (Congo, Côte d\'Ivoire, Sénégal, Cameroun).' },
+        { icon: '📱', tag: 'Suivi Parental', tagBg: 'bg-[#FEF6E7] text-[#F5A623]', title: 'Espace Parents & Alertes WhatsApp', description: 'Les parents reçoivent chaque semaine un bilan clair des heures de révision, des progrès et des matières nécessitant un accompagnement renforcé.' },
+        { icon: '⚡', tag: 'Mode Léger', tagBg: 'bg-indigo-50 text-indigo-600', title: 'Optimisé pour Faible Connexion', description: 'Consommation data ultra-réduite et fiches mémos téléchargeables pour continuer à réviser même sans connexion internet active.' },
+        { icon: '🏆', tag: 'Excellence', tagBg: 'bg-amber-50 text-amber-600', title: 'Bourses d\'Excellence Trimestrielles', description: 'Les meilleurs élèves de chaque promotion sur le classement E-School reçoivent des primes d\'études allant jusqu\'à 100 000 FCFA.' },
+        { icon: '👨‍🏫', tag: 'Corps Enseignant', tagBg: 'bg-emerald-50 text-emerald-600', title: 'Validé par des Professeurs Certifiés', description: 'Tous nos cours, exercices et synthèses sont rédigés et revus par des professeurs agrégés et inspecteurs pédagogiques régionaux.' }
+      ];
+
+      return (
+        <section id="features-section" className="py-20 bg-white border-y border-slate-100 scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-[#2F6FED] border border-blue-100 mb-3">
+                Fonctionnalités Clés
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#1A1D29] tracking-tight mb-4">
+                Tout ce dont un élève a besoin pour viser la <span className="bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] bg-clip-text text-transparent">Mention Très Bien</span>
+              </h2>
+              <p className="text-base text-slate-500 max-w-2xl mx-auto">
+                Une méthode pédagogique éprouvée alliant rigueur académique africaine, technologie d'apprentissage et accompagnement sur-mesure.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {features.map((feat, index) => (
+                <div key={index} className="p-7 rounded-2xl bg-[#F7F8FA] border border-slate-200/60 hover:border-blue-200 hover:bg-white shadow-xs card-hover flex flex-col justify-between group">
+                  <div>
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-200">
+                        {feat.icon}
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${feat.tagBg}`}>
+                        {feat.tag}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#1A1D29] mb-2 group-hover:text-[#2F6FED] transition-colors">
+                      {feat.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 leading-relaxed font-normal">
+                      {feat.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-5 mt-5 border-t border-slate-200/50 flex items-center text-xs font-bold text-[#2F6FED] group-hover:translate-x-1 transition-transform">
+                    <span>En savoir plus</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // 10. COMPOSANT PRICING (TARIFS FCFA)
+    function Pricing() {
+      const [isAnnual, setIsAnnual] = useState(true);
+
+      const tiers = [
+        {
+          name: 'Formule Découverte',
+          badge: 'Accès Immédiat',
+          price: '0 FCFA',
+          period: 'Gratuit à vie',
+          subtitle: 'Idéal pour tester la méthode E-School et mesurer son potentiel.',
+          features: [
+            '50 exercices corrigés fondamentaux',
+            '1 simulation de Bac / BEPC',
+            'Accès au tableau de bord individuel',
+            'Fiches de cours synthétiques',
+            'Assistance par email'
+          ],
+          cta: 'Créer mon compte gratuit',
+          popular: false,
+          ctaStyle: 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+        },
+        {
+          name: 'Formule Pro Mensuelle',
+          badge: 'Le Plus Populaire',
+          price: isAnnual ? '10 000 FCFA' : '15 000 FCFA',
+          period: isAnnual ? 'par mois (facturé annuellement)' : 'par mois sans engagement',
+          subtitle: 'La formule complète recommandée par les professeurs pour réussir l\'examen.',
+          features: [
+            '+5 000 exercices & annales d\'examens',
+            'Tuteur IA E-School illimité 24h/24',
+            'Simulations hebdomadaires du Bac & BEPC',
+            'Tableau de bord de performance complet',
+            'Rapports d\'avancement pour les parents',
+            'Accès prioritaire aux sessions live'
+          ],
+          cta: 'Commencer l\'abonnement Pro',
+          popular: true,
+          ctaStyle: 'bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white shadow-lg shadow-blue-500/25'
+        },
+        {
+          name: 'Formule Annuelle Excellence',
+          badge: 'Économie Maximale',
+          price: '120 000 FCFA',
+          period: 'par an (au lieu de 180 000 FCFA)',
+          savings: 'Économisez 60 000 FCFA',
+          subtitle: 'L\'accompagnement intégral jusqu\'au jour J avec mentorat dédié.',
+          features: [
+            'Tous les avantages de la formule Pro',
+            'Économie immédiate de 60 000 FCFA',
+            '2 bilans d\'orientation personnalisés',
+            'Accès aux épreuves blanches régionales',
+            'Éligibilité automatique aux Bourses',
+            'Ligne directe WhatsApp avec les tuteurs'
+          ],
+          cta: 'Choisir la Formule Excellence',
+          popular: false,
+          ctaStyle: 'bg-[#1A1D29] text-white hover:bg-slate-800 shadow-md'
+        }
+      ];
+
+      return (
+        <section id="pricing-section" className="py-20 bg-[#F7F8FA] scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-[#2F6FED] border border-blue-100 mb-3">
+                Tarifs Clairs & Transparents
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#1A1D29] tracking-tight mb-4">
+                Investissez dans l'avenir académique de votre enfant
+              </h2>
+              <p className="text-base text-slate-500 max-w-xl mx-auto mb-8">
+                Des tarifs justes, sans frais cachés, payables facilement par vos moyens de paiement mobiles locaux préférés.
+              </p>
+
+              <div className="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                <button
+                  onClick={() => setIsAnnual(false)}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                    !isAnnual ? 'bg-[#2F6FED] text-white shadow-sm' : 'text-slate-600 hover:text-[#1A1D29]'
+                  }`}
+                >
+                  Facturation Mensuelle
+                </button>
+                <button
+                  onClick={() => setIsAnnual(true)}
+                  className={`relative px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                    isAnnual ? 'bg-[#2F6FED] text-white shadow-sm' : 'text-slate-600 hover:text-[#1A1D29]'
+                  }`}
+                >
+                  Facturation Annuelle
+                  <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#E8F8EE] text-[#22C55E]">
+                    -33%
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-14">
+              {tiers.map((tier, index) => (
+                <div
+                  key={index}
+                  className={`rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative ${
+                    tier.popular
+                      ? 'bg-white border-2 border-[#2F6FED] shadow-xl shadow-blue-500/10 lg:-translate-y-2'
+                      : 'bg-white border border-slate-200/80 shadow-sm hover:shadow-md'
+                  }`}
+                >
+                  {tier.popular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs font-black uppercase tracking-wider shadow-sm">
+                      ★ Choix N°1 des Familles
+                    </div>
+                  )}
+
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xl font-bold text-[#1A1D29]">{tier.name}</h3>
+                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg ${
+                        tier.popular ? 'bg-blue-50 text-[#2F6FED]' : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {tier.badge}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-500 mb-6 leading-relaxed">{tier.subtitle}</p>
+
+                    <div className="mb-6 pb-6 border-b border-slate-100">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl sm:text-4xl font-black text-[#1A1D29] tracking-tight">{tier.price}</span>
+                      </div>
+                      <div className="text-xs font-semibold text-slate-500 mt-1">{tier.period}</div>
+                      {tier.savings && (
+                        <div className="mt-2 inline-block px-2.5 py-0.5 rounded-md text-xs font-extrabold bg-[#E8F8EE] text-[#22C55E]">
+                          {tier.savings}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3 mb-8">
+                      <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Inclus dans cette formule :</div>
+                      {tier.features.map((feat, fIdx) => (
+                        <div key={fIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
+                          <svg className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <button className={`w-full py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm transition-all duration-200 btn-hover ${tier.ctaStyle}`}>
+                      {tier.cta}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl bg-white border border-slate-200/70 p-6 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#2F6FED] flex items-center justify-center text-xl font-bold">🔒</div>
+                <div>
+                  <div className="text-sm font-bold text-[#1A1D29]">Paiement 100% sécurisé par Mobile Money & Carte</div>
+                  <div className="text-xs text-slate-400">Activation immédiate de votre compte dès la confirmation du règlement.</div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-bold text-slate-600">
+                <span className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200/60">Wave</span>
+                <span className="px-3 py-1.5 rounded-lg bg-orange-50 text-orange-600 border border-orange-200/60">Orange Money</span>
+                <span className="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60">MTN MoMo</span>
+                <span className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/60">Airtel Money</span>
+                <span className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200/60">Visa / Mastercard</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // 11. COMPOSANT TESTIMONIALS
+    function Testimonials() {
+      const reviews = [
+        {
+          name: 'Marcel Junior',
+          role: 'Major de Promotion 2025 • Brazzaville 🇨🇬',
+          badge: 'Mention Très Bien (18.2/20)',
+          avatar: 'assets/images/marcel-junior.jpg',
+          comment: 'Grâce à E-School, j\'ai pu m\'entraîner chaque jour avec les épreuves types du Baccalauréat. L\'algorithme détecte immédiatement les lacunes et propose les bons exercices pour progresser rapidement.'
+        },
+        {
+          name: 'Fatoumata Bamba',
+          role: 'Bachelière Série D • Dakar',
+          badge: 'Mention Bien (15.8/20)',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+          comment: 'L\'assistant IA E-School m\'a littéralement sauvée en Sciences de la Vie et en Chimie organique. Dès que j\'avais un blocage à 22h, j\'obtenais une explication détaillée sans devoir attendre le cours du lendemain.'
+        },
+        {
+          name: 'Dr. Jean-Marc Kouadio',
+          role: 'Parent d\'élève en Terminale • Yaoundé',
+          badge: 'Parent d\'Élève Vérifié',
+          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
+          comment: 'Pour 15 000 FCFA par mois, le service est sans commune mesure avec les répétiteurs traditionnels. Les rapports hebdomadaires par message m\'ont permis de suivre sérieusement l\'effort de mon fils chaque semaine.'
+        }
+      ];
+
+      return (
+        <section id="testimonials-section" className="py-20 bg-white border-b border-slate-100 scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8F8EE] text-[#22C55E] border border-green-100 mb-3">
+                Témoignages & Réussites
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#1A1D29] tracking-tight mb-4">
+                Ils ont décroché leur examen avec les félicitations du jury
+              </h2>
+              <p className="text-base text-slate-500 max-w-xl mx-auto">
+                Découvrez comment E-School transforme les notes de milliers d'élèves à travers l'Afrique francophone.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
+              {reviews.map((rev, index) => (
+                <div key={index} className="rounded-3xl p-7 bg-[#F7F8FA] border border-slate-200/60 flex flex-col justify-between card-hover">
+                  <div>
+                    <div className="flex items-center gap-1 text-amber-400 text-sm mb-4">★★★★★</div>
+                    <p className="text-sm text-slate-600 leading-relaxed italic mb-6">"{rev.comment}"</p>
+                  </div>
+
+                  <div className="pt-5 border-t border-slate-200/60 flex items-center gap-3.5">
+                    <img src={rev.avatar} alt={rev.name} className="w-12 h-12 rounded-2xl object-cover object-top ring-2 ring-white shadow-xs" />
+                    <div>
+                      <div className="text-sm font-bold text-[#1A1D29] leading-tight">{rev.name}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">{rev.role}</div>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-[#2F6FED]">{rev.badge}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl bg-gradient-to-r from-slate-900 to-[#1A1D29] text-white p-8 shadow-lg flex flex-col sm:flex-row items-center justify-around gap-6 text-center sm:text-left">
+              <div>
+                <div className="text-3xl sm:text-4xl font-black text-white">94.8%</div>
+                <div className="text-xs text-slate-300 mt-1">Taux de réussite officiel au Bac 2025</div>
+              </div>
+              <div className="w-px h-10 bg-slate-700 hidden sm:block"></div>
+              <div>
+                <div className="text-3xl sm:text-4xl font-black text-[#22C55E]">86%</div>
+                <div className="text-xs text-slate-300 mt-1">Élèves ayant obtenu une Mention</div>
+              </div>
+              <div className="w-px h-10 bg-slate-700 hidden sm:block"></div>
+              <div>
+                <div className="text-3xl sm:text-4xl font-black text-[#F5A623]">+3.8 pts</div>
+                <div className="text-xs text-slate-300 mt-1">Gain moyen sur la moyenne générale</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // 12. COMPOSANT FAQ
+    function FAQ() {
+      const [openIndex, setOpenIndex] = useState(0);
+
+      const faqs = [
+        {
+          q: 'Quels sont les moyens de paiement acceptés pour régler en FCFA ?',
+          a: 'Vous pouvez régler votre abonnement en toute sécurité par Wave, Orange Money, MTN Mobile Money, Airtel Money ainsi que par carte bancaire (Visa et Mastercard). La validation est instantanée et votre accès complet est débloqué dans la minute.'
+        },
+        {
+          q: 'Le contenu est-il conforme au programme officiel du Congo et de la sous-région ?',
+          a: 'Oui, nos contenus sont rigoureusement alignés sur les programmes officiels de l\'Éducation Nationale du Congo (Brazzaville) et d\'Afrique Centrale, pour les séries Scientifiques (C, D), Littéraires (A) et le premier cycle (BEPC).'
+        },
+        {
+          q: 'E-School fonctionne-t-il sur un simple smartphone avec peu de connexion ?',
+          a: 'Parfaitement. La plateforme a été développée selon des standards stricts de légèreté. Les pages chargent en moins d\'une seconde, la consommation de data est minimale et les fiches résumées peuvent être téléchargées pour une révision hors-ligne.'
+        },
+        {
+          q: 'Comment fonctionne l\'essai gratuit à 0 FCFA ?',
+          a: 'L\'inscription à la Formule Découverte est 100% gratuite et sans aucun moyen de paiement requis. Vous avez immédiatement accès à 50 exercices corrigés, à une simulation complète d\'examen et à votre tableau de bord de performance.'
+        },
+        {
+          q: 'Comment les parents peuvent-ils suivre la progression de leur enfant ?',
+          a: 'Un espace parent dédié permet de lier votre numéro WhatsApp. Vous recevez chaque fin de semaine un récapitulatif clair : heures de révision effectuées, taux de réussite par matière et recommandations pour les examens à venir.'
+        }
+      ];
+
+      const toggle = (idx) => {
+        setOpenIndex(openIndex === idx ? null : idx);
+      };
+
+      return (
+        <section id="faq-section" className="py-20 bg-[#F7F8FA] scroll-mt-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-14">
+              <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-[#2F6FED] border border-blue-100 mb-3">
+                Questions Fréquentes
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#1A1D29] tracking-tight mb-4">
+                Tout ce que vous devez savoir sur E-School
+              </h2>
+              <p className="text-sm sm:text-base text-slate-500">
+                Une question supplémentaire ? Notre équipe pédagogique vous répond 7j/7 via WhatsApp.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {faqs.map((item, index) => {
+                const isOpen = openIndex === index;
+                return (
+                  <div
+                    key={index}
+                    className={`rounded-2xl transition-all duration-200 border ${
+                      isOpen ? 'bg-white border-[#2F6FED]/40 shadow-sm' : 'bg-white/80 border-slate-200/70 hover:border-slate-300'
+                    }`}
+                  >
+                    <button
+                      onClick={() => toggle(index)}
+                      className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                    >
+                      <span className="text-sm sm:text-base font-bold text-[#1A1D29]">{item.q}</span>
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 ${
+                        isOpen ? 'bg-blue-50 text-[#2F6FED] rotate-180' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <div className="px-5 pb-6 sm:px-6 text-xs sm:text-sm text-slate-600 leading-relaxed animate-fadeInUp">
+                        <div className="pt-2 border-t border-slate-100">{item.a}</div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // 13. COMPOSANT FOOTER
+    function Footer() {
+      const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const scrollToPricing = () => {
+        const el = document.getElementById('pricing-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      };
+
+      return (
+        <footer className="bg-[#1A1D29] text-white pt-16 pb-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#2F6FED] via-[#255ED4] to-[#1E4FD1] p-8 sm:p-12 mb-16 shadow-2xl shadow-blue-500/20 text-center">
+              <div className="relative z-10 max-w-2xl mx-auto">
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm mb-4">
+                  Rejoignez plus de 25 000 élèves
+                </span>
+                <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-4">
+                  Prêt à décrocher votre examen avec Mention ?
+                </h3>
+                <p className="text-sm sm:text-base text-blue-100 mb-8 font-normal">
+                  Créez votre compte en 2 minutes et commencez vos premières simulations d'exercices gratuitement.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button
+                    onClick={scrollToPricing}
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-white text-[#1A1D29] font-black text-sm sm:text-base hover:bg-blue-50 shadow-lg btn-hover"
+                  >
+                    Commencer gratuitement (0 FCFA)
+                  </button>
+                  <button
+                    onClick={scrollToTop}
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base border border-white/20 backdrop-blur-sm btn-hover"
+                  >
+                    Retour en haut ↑
+                  </button>
+                </div>
+              </div>
+              <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="absolute -left-10 -top-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800 text-xs sm:text-sm">
+              <div className="lg:col-span-2">
+                <div className="flex items-center gap-3 mb-4 cursor-pointer" onClick={scrollToTop}>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2F6FED] to-[#1E4FD1] flex items-center justify-center shadow-md">
+                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                    </svg>
+                  </div>
+                  <span className="text-xl font-black tracking-tight text-white">E-School</span>
+                </div>
+                <p className="text-slate-400 text-xs leading-relaxed max-w-sm mb-6">
+                  E-School est la plateforme technologique d'excellence éducative conçue pour démocratiser l'accès aux meilleurs outils d'apprentissage en Afrique Centrale et francophone.
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] animate-pulse"></span>
+                  <span>Plateforme active • Serveurs en ligne (99.9%)</span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-white uppercase text-xs tracking-wider mb-4">Plateforme</h4>
+                <ul className="space-y-2.5 text-xs text-slate-400">
+                  <li><a href="#dashboard-section" className="hover:text-white transition-colors">Tableau de bord</a></li>
+                  <li><a href="#features-section" className="hover:text-white transition-colors">Exercices Corrigés</a></li>
+                  <li><a href="#features-section" className="hover:text-white transition-colors">Simulations du Bac</a></li>
+                  <li><a href="#dashboard-section" className="hover:text-white transition-colors">Assistant Pédagogique IA</a></li>
+                  <li><a href="#features-section" className="hover:text-white transition-colors">Espace Parents</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-white uppercase text-xs tracking-wider mb-4">Matières Clés</h4>
+                <ul className="space-y-2.5 text-xs text-slate-400">
+                  <li><span className="hover:text-white transition-colors">Mathématiques (C, D, S)</span></li>
+                  <li><span className="hover:text-white transition-colors">Physique & Chimie</span></li>
+                  <li><span className="hover:text-white transition-colors">Sciences de la Vie (SVT)</span></li>
+                  <li><span className="hover:text-white transition-colors">Informatique & Algorithmique</span></li>
+                  <li><span className="hover:text-white transition-colors">Français & Philosophie</span></li>
+                  <li><span className="hover:text-white transition-colors">Anglais & LV1</span></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-white uppercase text-xs tracking-wider mb-4">Informations</h4>
+                <ul className="space-y-2.5 text-xs text-slate-400">
+                  <li><a href="#pricing-section" className="hover:text-white transition-colors">Tarifs en FCFA</a></li>
+                  <li><a href="#testimonials-section" className="hover:text-white transition-colors">Témoignages Bacheliers</a></li>
+                  <li><a href="#faq-section" className="hover:text-white transition-colors">FAQ & Assistance</a></li>
+                  <li><span className="hover:text-white transition-colors">Bourses d'Excellence</span></li>
+                  <li><span className="hover:text-white transition-colors">Politique de Confidentialité</span></li>
+                  <li><span className="hover:text-white transition-colors">Conditions Générales</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+              <div>© 2026 E-School Technologies Africa. Tous droits réservés.</div>
+              <div className="flex items-center gap-4 text-slate-400">
+                <span>Brazzaville</span><span>•</span><span>Pointe-Noire</span><span>•</span><span>Libreville</span><span>•</span><span>Douala</span><span>•</span><span>Kinshasa</span>
+              </div>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    // 14. COMPOSANT MODALE MOT DE PASSE OUBLIÉ
+    function ForgotPasswordModal({ emailDefault, onClose }) {
+      const [resetEmail, setResetEmail] = useState(emailDefault || '');
+      const [isSent, setIsSent] = useState(false);
+      const [isSending, setIsSending] = useState(false);
+
+      const handleSend = (e) => {
+        e.preventDefault();
+        if (!resetEmail.trim()) return;
+
+        setIsSending(true);
+        setTimeout(() => {
+          setIsSending(false);
+          setIsSent(true);
+        }, 600);
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeInUp">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative">
+            <button
+              onClick={onClose}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              ✕
+            </button>
+
+            {!isSent ? (
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#2F6FED] flex items-center justify-center text-2xl mb-4">
+                  🔑
+                </div>
+                <h3 className="text-xl font-extrabold text-[#1A1D29] tracking-tight mb-2">
+                  Mot de passe oublié ?
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
+                  Saisissez l'adresse email associée à votre compte élève. Nous vous enverrons immédiatement un lien pour réinitialiser votre accès.
+                </p>
+
+                <form onSubmit={handleSend} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                      Votre Adresse Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      placeholder="marcel.junior@eschool.cg"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-[#1A1D29] focus:bg-white focus:border-[#2F6FED] focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 btn-hover cursor-pointer transition-all disabled:opacity-75"
+                  >
+                    {isSending ? 'Envoi en cours...' : 'Envoyer le lien de réinitialisation'}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="text-center py-2 animate-fadeInUp">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-[#22C55E] flex items-center justify-center text-3xl mx-auto mb-4">
+                  ✓
+                </div>
+                <h3 className="text-xl font-extrabold text-[#1A1D29] tracking-tight mb-2">
+                  Lien de réinitialisation envoyé !
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed">
+                  Un email contenant les instructions vient d'être expédié à l'adresse <strong className="text-[#1A1D29]">{resetEmail}</strong>. Veuillez vérifier votre boîte de réception et vos courriers indésirables.
+                </p>
+                <button
+                  onClick={onClose}
+                  className="w-full py-3 px-6 rounded-xl bg-[#2F6FED] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 btn-hover cursor-pointer"
+                >
+                  Retour à la page de connexion
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // 15. COMPOSANT PAGE DE CONNEXION (LOGIN)
+    function LoginPage({ onNavigate, onLoginSuccess }) {
+      const [email, setEmail] = useState('marcel.junior@eschool.cg');
+      const [password, setPassword] = useState('eschool2026');
+      const [showPassword, setShowPassword] = useState(false);
+      const [rememberMe, setRememberMe] = useState(true);
+      const [isLoading, setIsLoading] = useState(false);
+      const [errorMessage, setErrorMessage] = useState('');
+      const [showForgotModal, setShowForgotModal] = useState(false);
+
+      const handleSubmit = (e) => {
+        if (e) e.preventDefault();
+        setErrorMessage('');
+
+        if (!email.trim()) {
+          setErrorMessage('Veuillez saisir votre adresse email.');
+          return;
+        }
+        if (!password.trim()) {
+          setErrorMessage('Veuillez saisir votre mot de passe.');
+          return;
+        }
+
+        setIsLoading(true);
+
+        setTimeout(() => {
+          setIsLoading(false);
+          if (onLoginSuccess) {
+            onLoginSuccess({
+              email,
+              name: email.toLowerCase().includes('marcel') ? 'Marcel Junior' : 'Élève E-School',
+              grade: 'Terminale C',
+              city: 'Brazzaville 🇨🇬',
+              school: 'Lycée Chaminade',
+              avatar: 'assets/images/marcel-junior.jpg'
+            });
+          }
+        }, 600);
+      };
+
+      const handleDemoFill = () => {
+        setEmail('marcel.junior@eschool.cg');
+        setPassword('eschool2026');
+        setErrorMessage('');
+      };
+
+      return (
+        <div className="min-h-screen bg-[#F7F8FA] text-[#1A1D29] flex flex-col justify-between relative overflow-hidden font-sans selection:bg-blue-100 selection:text-[#2F6FED]">
+          
+          {/* Fond subtil texturé Congo */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-10 mix-blend-multiply bg-cover bg-center"
+            style={{ backgroundImage: "url('assets/images/congo-bg.jpg')" }}
+          ></div>
+
+          {/* Cercles diffus d'ambiance */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 pointer-events-none overflow-hidden">
+            <div className="absolute -top-32 left-1/4 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl"></div>
+            <div className="absolute top-10 right-1/4 w-80 h-80 bg-emerald-100/40 rounded-full blur-3xl"></div>
+          </div>
+
+          {/* Barre supérieure épurée */}
+          <header className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+            <div
+              onClick={() => onNavigate('landing')}
+              className="flex items-center gap-3 cursor-pointer group"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2F6FED] to-[#1E4FD1] flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200">
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xl font-black tracking-tight text-[#1A1D29]">E-School</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-[#E8F8EE] text-[#22C55E]">SaaS</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => onNavigate('landing')}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-[#1A1D29] hover:bg-slate-200/50 transition-colors btn-hover cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Retour à l'accueil</span>
+            </button>
+          </header>
+
+          {/* Contenu Principal */}
+          <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+            <div className="max-w-md w-full mx-auto">
+              
+              <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 p-6 sm:p-9 relative overflow-hidden animate-fadeInUp">
+                
+                {/* Liseré supérieur aux couleurs de la marque */}
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#2F6FED] via-[#1E4FD1] to-[#22C55E]"></div>
+
+                {/* En-tête */}
+                <div className="text-center mb-6 pt-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#2F6FED] text-xs font-bold mb-3">
+                    <span>🔐</span>
+                    <span>Espace Membre Élève</span>
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight mb-2">
+                    Bon retour parmi nous
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
+                    Connectez-vous pour retrouver vos cours, séries d'exercices et simulations du Bac.
+                  </p>
+                </div>
+
+                {/* Encadré d'Accès Démo 1-Clic */}
+                <div className="mb-6 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-blue-50/90 border border-blue-200/80 rounded-2xl p-3.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#2F6FED] to-[#1E4FD1] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                        ⚡
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-[#1A1D29]">Compte Démo Pré-configuré</div>
+                        <div className="text-[11px] text-slate-600">Marcel Junior • Terminale C (Brazzaville)</div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleDemoFill}
+                      className="px-2.5 py-1.5 rounded-lg bg-white border border-blue-200 text-[#2F6FED] text-[11px] font-bold shadow-2xs hover:bg-blue-50 transition-all cursor-pointer whitespace-nowrap btn-hover"
+                    >
+                      Remplir
+                    </button>
+                  </div>
+                </div>
+
+                {/* Message d'erreur éventuel */}
+                {errorMessage && (
+                  <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold flex items-center gap-2 animate-fadeInUp">
+                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                {/* Formulaire de Connexion */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  
+                  {/* Email */}
+                  <div>
+                    <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                      Adresse Email
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                        </svg>
+                      </div>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="marcel.junior@eschool.cg"
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:bg-white focus:border-[#2F6FED] focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mot de passe */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-[#1A1D29] uppercase tracking-wider">
+                        Mot de passe
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotModal(true)}
+                        className="text-xs font-semibold text-[#2F6FED] hover:text-[#1E4FD1] hover:underline cursor-pointer"
+                      >
+                        Mot de passe oublié ?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full pl-10 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:bg-white focus:border-[#2F6FED] focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                      >
+                        {showPassword ? (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Se souvenir de moi */}
+                  <div className="flex items-center justify-between pt-1">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 rounded text-[#2F6FED] border-slate-300 focus:ring-[#2F6FED] cursor-pointer"
+                      />
+                      <span className="text-xs font-medium text-slate-600">Se souvenir de moi</span>
+                    </label>
+                    <span className="text-[11px] text-slate-400 font-medium">Session sécurisée</span>
+                  </div>
+
+                  {/* Bouton de Soumission */}
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full mt-3 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-sm font-bold shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 btn-hover cursor-pointer transition-all disabled:opacity-75"
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Connexion en cours...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Se connecter à mon espace</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+
+                </form>
+
+                {/* Séparateur */}
+                <div className="relative my-6 text-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-100"></div>
+                  </div>
+                  <span className="relative px-3 bg-white text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                    Nouveau sur E-School ?
+                  </span>
+                </div>
+
+                {/* Lien Inscription */}
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('signup')}
+                    className="w-full py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-xs sm:text-sm font-bold text-[#1A1D29] hover:text-[#2F6FED] transition-all flex items-center justify-center gap-2 card-hover cursor-pointer"
+                  >
+                    <span>Créer un compte élève gratuit</span>
+                    <span className="text-[#22C55E]">✨</span>
+                  </button>
+                </div>
+
+              </div>
+
+              {/* Badges de confiance */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <span>🔒</span> Chiffrement SSL 256-bit
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">
+                  <span>🇨🇬</span> Programmes Congo & CEMAC
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">
+                  <span>⚡</span> Support 7j/7
+                </span>
+              </div>
+
+            </div>
+          </main>
+
+          {/* Pied de page discret */}
+          <footer className="relative z-10 py-4 text-center text-xs text-slate-400">
+            © 2026 E-School Technologies Africa. Tous droits réservés.
+          </footer>
+
+          {/* Modale Mot de passe oublié */}
+          {showForgotModal && (
+            <ForgotPasswordModal
+              emailDefault={email}
+              onClose={() => setShowForgotModal(false)}
+            />
+          )}
+
+        </div>
+      );
+    }
+
+    // 16. COMPOSANT PAGE D'INSCRIPTION ÉLÈVE (SIGNUP)
+    function SignupPage({ onNavigate, onSignupSuccess }) {
+      const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        city: 'Brazzaville 🇨🇬',
+        school: '',
+        grade: 'Terminale C',
+        password: '',
+        confirmPassword: '',
+        agreeTerms: false
+      });
+
+      const [showPassword, setShowPassword] = useState(false);
+      const [isLoading, setIsLoading] = useState(false);
+      const [errorMessage, setErrorMessage] = useState('');
+
+      const gradesList = [
+        'Terminale C (Scientifique)',
+        'Terminale D (Sciences Naturelles)',
+        'Terminale A (Littéraire)',
+        'Première C',
+        'Première D',
+        'Première A',
+        'Seconde Scientifique',
+        'Troisième (Prépa BEPC)'
+      ];
+
+      const citiesList = [
+        'Brazzaville 🇨🇬',
+        'Pointe-Noire 🇨🇬',
+        'Dolisie 🇨🇬',
+        'Nkayi 🇨🇬',
+        'Ouesso 🇨🇬',
+        'Oyo 🇨🇬',
+        'Libreville 🇬🇦',
+        'Douala / Yaoundé 🇨🇲',
+        'Autre ville'
+      ];
+
+      const handleDemoFill = () => {
+        setFormData({
+          fullName: 'Grâce Ngoma',
+          email: 'grace.ngoma@eschool.cg',
+          phone: '+242 06 912 34 56',
+          city: 'Pointe-Noire 🇨🇬',
+          school: 'Lycée Victor Augagneur',
+          grade: 'Terminale D (Sciences Naturelles)',
+          password: 'graceSaaS2026!',
+          confirmPassword: 'graceSaaS2026!',
+          agreeTerms: true
+        });
+        setErrorMessage('');
+      };
+
+      const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+          ...prev,
+          [name]: type === 'checkbox' ? checked : value
+        }));
+      };
+
+      const getPasswordStrength = () => {
+        const pwd = formData.password;
+        if (!pwd) return { level: 0, text: '', color: 'bg-slate-200' };
+        if (pwd.length < 6) return { level: 1, text: 'Trop court', color: 'bg-red-400' };
+        if (pwd.length < 9) return { level: 2, text: 'Moyen', color: 'bg-amber-400' };
+        return { level: 3, text: 'Sécurisé', color: 'bg-emerald-500' };
+      };
+
+      const strength = getPasswordStrength();
+
+      const handleSubmit = (e) => {
+        if (e) e.preventDefault();
+        setErrorMessage('');
+
+        if (!formData.fullName.trim()) {
+          setErrorMessage('Veuillez saisir votre nom complet.');
+          return;
+        }
+        if (!formData.email.trim() || !formData.email.includes('@')) {
+          setErrorMessage('Veuillez saisir une adresse email valide.');
+          return;
+        }
+        if (!formData.password) {
+          setErrorMessage('Veuillez définir un mot de passe.');
+          return;
+        }
+        if (formData.password.length < 6) {
+          setErrorMessage('Le mot de passe doit contenir au moins 6 caractères.');
+          return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setErrorMessage('Les deux mots de passe ne correspondent pas.');
+          return;
+        }
+        if (!formData.agreeTerms) {
+          setErrorMessage('Veuillez accepter les conditions générales pour poursuivre.');
+          return;
+        }
+
+        setIsLoading(true);
+
+        setTimeout(() => {
+          setIsLoading(false);
+          if (onSignupSuccess) {
+            onSignupSuccess({
+              name: formData.fullName,
+              email: formData.email,
+              phone: formData.phone,
+              city: formData.city,
+              school: formData.school || 'Lycée d\'Excellence',
+              grade: formData.grade.split(' ')[0] + ' ' + (formData.grade.split(' ')[1] || ''),
+              avatar: 'assets/images/marcel-junior.jpg',
+              plan: 'Pro (15 000 FCFA/mois)',
+              expiresAt: '17 Octobre 2026'
+            });
+          }
+        }, 700);
+      };
+
+      return (
+        <div className="min-h-screen bg-[#F7F8FA] text-[#1A1D29] flex flex-col justify-between relative overflow-hidden font-sans selection:bg-blue-100 selection:text-[#2F6FED]">
+          <div
+            className="absolute inset-0 pointer-events-none opacity-10 mix-blend-multiply bg-cover bg-center"
+            style={{ backgroundImage: "url('assets/images/congo-bg.jpg')" }}
+          ></div>
+
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 pointer-events-none overflow-hidden">
+            <div className="absolute -top-32 left-1/4 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl"></div>
+            <div className="absolute top-10 right-1/4 w-80 h-80 bg-emerald-100/40 rounded-full blur-3xl"></div>
+          </div>
+
+          <header className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+            <div
+              onClick={() => onNavigate('landing')}
+              className="flex items-center gap-3 cursor-pointer group"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2F6FED] to-[#1E4FD1] flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200">
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xl font-black tracking-tight text-[#1A1D29]">E-School</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-[#E8F8EE] text-[#22C55E]">SaaS</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => onNavigate('landing')}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-[#1A1D29] hover:bg-slate-200/50 transition-colors btn-hover cursor-pointer"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Retour à l'accueil</span>
+            </button>
+          </header>
+
+          <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-10">
+            <div className="max-w-xl w-full mx-auto">
+              <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-100 p-6 sm:p-9 relative overflow-hidden animate-fadeInUp">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#2F6FED] via-[#1E4FD1] to-[#22C55E]"></div>
+
+                <div className="text-center mb-6 pt-1">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#2F6FED] text-xs font-bold mb-3">
+                    <span>🚀</span>
+                    <span>Création de Compte Élève</span>
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight mb-2">
+                    Rejoignez E-School
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+                    Accédez à plus de 5 000 exercices interactifs, simulations du Bac et fiches de synthèse pour réussir avec mention.
+                  </p>
+                </div>
+
+                <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 to-indigo-50/80 border border-blue-100/90 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#2F6FED] text-white flex items-center justify-center text-sm font-bold shrink-0">
+                      ⚡
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#1A1D29]">Profil Démo Pré-rempli</div>
+                      <div className="text-[11px] text-slate-500">Grâce Ngoma • Terminale D • Pointe-Noire</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDemoFill}
+                    className="px-3.5 py-1.5 bg-white hover:bg-blue-50 text-[#2F6FED] border border-blue-200 rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer btn-hover shrink-0"
+                  >
+                    Remplir en 1 clic
+                  </button>
+                </div>
+
+                {errorMessage && (
+                  <div className="mb-5 p-3.5 rounded-2xl bg-red-50 border border-red-200/80 text-red-600 text-xs font-medium flex items-center gap-2.5 animate-fadeInUp">
+                    <span className="text-base">⚠️</span>
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                      Nom & Prénom de l'Élève <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      placeholder="Ex: Grâce Ngoma"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                        Adresse Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="eleve@eschool.cg"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                        WhatsApp / Téléphone
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="+242 06 000 00 00"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                        Classe / Série du Bac <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="grade"
+                        value={formData.grade}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold text-[#1A1D29] focus:outline-none focus:border-[#2F6FED] focus:bg-white cursor-pointer"
+                      >
+                        {gradesList.map((g) => (
+                          <option key={g} value={g}>{g}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                        Ville de Résidence <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold text-[#1A1D29] focus:outline-none focus:border-[#2F6FED] focus:bg-white cursor-pointer"
+                      >
+                        {citiesList.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                      Lycée / Établissement
+                    </label>
+                    <input
+                      type="text"
+                      name="school"
+                      value={formData.school}
+                      onChange={handleChange}
+                      placeholder="Ex: Lycée Chaminade, Lycée Victor Augagneur..."
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                        Mot de passe <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          name="password"
+                          value={formData.password}
+                          onChange={handleChange}
+                          placeholder="••••••••"
+                          className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                        >
+                          {showPassword ? '🙈' : '👁️'}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase tracking-wider">
+                        Confirmer mot de passe <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  {formData.password && (
+                    <div className="flex items-center gap-2 pt-1 animate-fadeInUp">
+                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden flex gap-1">
+                        <div className={`h-full flex-1 rounded-full ${strength.level >= 1 ? strength.color : 'bg-transparent'}`}></div>
+                        <div className={`h-full flex-1 rounded-full ${strength.level >= 2 ? strength.color : 'bg-transparent'}`}></div>
+                        <div className={`h-full flex-1 rounded-full ${strength.level >= 3 ? strength.color : 'bg-transparent'}`}></div>
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-500">{strength.text}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-2">
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        name="agreeTerms"
+                        checked={formData.agreeTerms}
+                        onChange={handleChange}
+                        className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#2F6FED] focus:ring-[#2F6FED] cursor-pointer"
+                      />
+                      <span className="text-xs text-slate-600 leading-relaxed">
+                        J'accepte les Conditions Générales d'Utilisation et la charte de confidentialité d'E-School.
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="pt-3">
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-sm font-bold shadow-lg shadow-blue-500/25 btn-hover flex items-center justify-center gap-2.5 cursor-pointer"
+                    >
+                      {isLoading ? (
+                        <span>Création du compte en cours...</span>
+                      ) : (
+                        <>
+                          <span>Créer mon compte E-School</span>
+                          <span>→</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-100"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-3 bg-white text-slate-400 font-medium">Déjà inscrit ?</span>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('login')}
+                    className="font-bold text-[#2F6FED] hover:text-[#1E4FD1] underline underline-offset-2 transition-colors cursor-pointer text-xs sm:text-sm"
+                  >
+                    Se connecter à mon espace élève
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          <footer className="relative z-10 max-w-7xl w-full mx-auto px-4 py-6 text-center text-xs text-slate-400">
+            <p>© 2026 E-School Technologies Africa. Tous droits réservés.</p>
+          </footer>
+        </div>
+      );
+    }
+
+    // 17. COMPOSANT SIDEBAR SAAS ÉLÈVE
+    function AppSidebar({ activeTab, setActiveTab, user, onLogout, onViewLanding, isMobileOpen, setIsMobileOpen }) {
+      const menuItems = [
+        { id: 'dashboard', label: 'Tableau de bord', icon: '📊' },
+        { id: 'courses', label: 'Mes Cours & Séries', icon: '📚', badge: '12 fiches' },
+        { id: 'exams', label: 'Simulations du Bac', icon: '✍️', badge: 'Nouveau', badgeColor: 'bg-emerald-100 text-emerald-700' },
+        { id: 'subscription', label: 'Mon Abonnement Pro', icon: '💳', badge: '15 000 FCFA', badgeColor: 'bg-blue-100 text-[#1E4FD1]' },
+        { id: 'settings', label: 'Profil & Paramètres', icon: '⚙️' }
+      ];
+
+      return (
+        <>
+          {isMobileOpen && (
+            <div
+              onClick={() => setIsMobileOpen(false)}
+              className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden transition-opacity"
+            ></div>
+          )}
+
+          <aside
+            className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-white border-r border-slate-200/80 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+              isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+            }`}
+          >
+            <div>
+              {/* Header de la Sidebar */}
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                <div
+                  onClick={() => onViewLanding && onViewLanding()}
+                  className="flex items-center gap-3 cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2F6FED] to-[#1E4FD1] flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200 text-white font-bold">
+                    🎓
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xl font-black tracking-tight text-[#1A1D29]">E-School</span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-blue-50 text-[#2F6FED] border border-blue-200/60">Pro</span>
+                    </div>
+                    <p className="text-[10px] font-semibold text-slate-400">Espace de Travail Élève</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsMobileOpen(false)}
+                  className="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Carte Profil Élève */}
+              <div className="p-4 mx-3 my-3 bg-gradient-to-br from-slate-50 to-blue-50/40 rounded-2xl border border-slate-200/70">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img
+                      src={user.avatar || 'assets/images/marcel-junior.jpg'}
+                      alt={user.name}
+                      className="w-11 h-11 rounded-xl object-cover object-top ring-2 ring-[#2F6FED]/20"
+                    />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#22C55E] border-2 border-white rounded-full"></span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-black text-[#1A1D29] truncate">{user.name}</div>
+                    <div className="text-[11px] font-semibold text-[#2F6FED] truncate">{user.grade}</div>
+                    <div className="text-[10px] text-slate-400 truncate">{user.school || 'Lycée Chaminade'} • {user.city}</div>
+                  </div>
+                </div>
+
+                <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
+                  <span className="text-slate-500 font-medium">Abonnement :</span>
+                  <span className="font-bold text-[#1E4FD1] bg-blue-100/70 px-2 py-0.5 rounded-md">15 000 FCFA/m</span>
+                </div>
+              </div>
+
+              {/* Liens de Navigation */}
+              <nav className="px-3 space-y-1">
+                <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  Navigation
+                </div>
+
+                {menuItems.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setIsMobileOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white shadow-md shadow-blue-500/25'
+                          : 'text-slate-600 hover:text-[#1A1D29] hover:bg-slate-100/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-base">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </div>
+
+                      {item.badge && (
+                        <span
+                          className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : item.badgeColor || 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Pied de Sidebar */}
+            <div className="p-3 border-t border-slate-100 space-y-2">
+              <button
+                onClick={() => onViewLanding && onViewLanding()}
+                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-500 hover:text-[#1A1D29] hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+              >
+                <span>🌐</span>
+                <span>Voir le site public</span>
+              </button>
+
+              <button
+                onClick={onLogout}
+                className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
+              >
+                <span>🚪</span>
+                <span>Se déconnecter</span>
+              </button>
+
+              <div className="text-center pt-1 text-[10px] text-slate-400">
+                E-School v2.4 • Congo 🇨🇬
+              </div>
+            </div>
+          </aside>
+        </>
+      );
+    }
+
+    // 18. COMPOSANT BARRE SUPÉRIEURE SAAS (AppTopBar)
+    function AppTopBar({ user, onOpenMobileMenu, onSelectTab, onLogout }) {
+      const [showNotifications, setShowNotifications] = useState(false);
+      const [searchQuery, setSearchQuery] = useState('');
+
+      const mockNotifications = [
+        {
+          id: 1,
+          title: 'Correction de Devoir disponible',
+          time: 'Il y a 10 min',
+          desc: 'Votre simulation de Mathématiques a été corrigée : 17.5/20 !',
+          unread: true,
+          icon: '📝'
+        },
+        {
+          id: 2,
+          title: 'Nouveau sujet du Bac Congo en ligne',
+          time: 'Il y a 2h',
+          desc: 'Épreuve de Physique-Chimie Série C avec corrigé complet.',
+          unread: true,
+          icon: '⚡'
+        }
+      ];
+
+      return (
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 max-w-xl">
+            <button
+              onClick={onOpenMobileMenu}
+              className="lg:hidden p-2 rounded-xl text-slate-500 hover:text-[#1A1D29] hover:bg-slate-100 cursor-pointer"
+            >
+              ☰
+            </button>
+
+            <div className="relative w-full max-w-md">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                🔍
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher une épreuve, un cours, un corrigé..."
+                className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 text-[#1A1D29] placeholder-slate-400 focus:outline-none focus:border-[#2F6FED] focus:bg-white"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => onSelectTab('subscription')}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 text-xs font-bold text-[#1E4FD1] hover:shadow-xs transition-all cursor-pointer"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+              <span>15 000 FCFA</span>
+              <span className="text-[10px] font-normal text-slate-500">/mois</span>
+            </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 rounded-xl text-slate-500 hover:text-[#1A1D29] hover:bg-slate-100 transition-colors relative cursor-pointer"
+              >
+                🔔
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 z-50 animate-fadeInUp">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+                    <span className="text-xs font-black text-[#1A1D29]">Notifications</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-[#2F6FED]">2 nouvelles</span>
+                  </div>
+                  <div className="space-y-2">
+                    {mockNotifications.map(n => (
+                      <div key={n.id} className="p-2 hover:bg-slate-50 rounded-xl">
+                        <div className="text-xs font-bold text-[#1A1D29]">{n.icon} {n.title}</div>
+                        <div className="text-[11px] text-slate-500 mt-0.5">{n.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-2 text-center border-t border-slate-100 mt-2">
+                    <button onClick={() => setShowNotifications(false)} className="text-xs font-bold text-[#2F6FED] cursor-pointer">Fermer</button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div
+              onClick={() => onSelectTab('settings')}
+              className="flex items-center gap-2 pl-2 sm:pl-3 sm:border-l sm:border-slate-200 cursor-pointer group"
+            >
+              <img
+                src={user.avatar || 'assets/images/marcel-junior.jpg'}
+                alt={user.name}
+                className="w-8 h-8 rounded-xl object-cover object-top ring-1 ring-slate-200 group-hover:ring-[#2F6FED]"
+              />
+              <div className="hidden md:block text-left">
+                <div className="text-xs font-bold text-[#1A1D29] group-hover:text-[#2F6FED]">{user.name}</div>
+                <div className="text-[10px] text-slate-400">{user.grade}</div>
+              </div>
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    // 19. COMPOSANT COURS & FICHES (CoursesView)
+    function CoursesView({ onShowToast }) {
+      const [selectedSubject, setSelectedSubject] = useState('all');
+
+      const courses = [
+        { id: 1, subject: 'Mathématiques', icon: '📐', title: 'Analyse : Fonctions Logarithmes & Exponentielles', level: 'Terminale C & D', progress: 85, chapters: 6, exercises: 42, tag: 'Prioritaire Bac' },
+        { id: 2, subject: 'Physique-Chimie', icon: '⚡', title: 'Mécanique Newtonienne & Mouvement des Satellites', level: 'Terminale C & D', progress: 60, chapters: 5, exercises: 34, tag: 'Grand Classique' },
+        { id: 3, subject: 'SVT', icon: '🧬', title: 'Génétique Moléculaire, Brassages & Hérédité', level: 'Terminale D', progress: 40, chapters: 4, exercises: 28, tag: 'Indispensable' },
+        { id: 4, subject: 'Mathématiques', icon: '📐', title: 'Nombres Complexes & Géométrie dans le Plan', level: 'Terminale C', progress: 95, chapters: 7, exercises: 50, tag: 'Maîtrisé' }
+      ];
+
+      const filteredCourses = selectedSubject === 'all'
+        ? courses
+        : courses.filter(c => c.subject.toLowerCase() === selectedSubject.toLowerCase());
+
+      return (
+        <div className="space-y-6 animate-fadeInUp">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#2F6FED] text-xs font-bold mb-2">
+                <span>📚</span>
+                <span>Programme Officiel du Baccalauréat</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight">
+                Mes Cours & Fiches de Révision
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Fiches synthétiques, points clés et exercices corrigés pas à pas.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200 shadow-xs">
+              {['all', 'Mathématiques', 'Physique-Chimie', 'SVT'].map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => setSelectedSubject(sub)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    selectedSubject === sub
+                      ? 'bg-[#2F6FED] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-[#1A1D29]'
+                  }`}
+                >
+                  {sub === 'all' ? 'Toutes' : sub}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {filteredCourses.map((course) => (
+              <div key={course.id} className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:border-blue-300 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-xl">{course.icon}</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-extrabold">{course.tag}</span>
+                  </div>
+                  <div className="text-[11px] font-bold text-[#2F6FED] uppercase tracking-wider mb-1">{course.subject}</div>
+                  <h3 className="text-sm font-extrabold text-[#1A1D29] mb-3 leading-snug">{course.title}</h3>
+                </div>
+                <div>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between text-[11px] font-bold mb-1">
+                      <span className="text-slate-500">Progression</span>
+                      <span className="text-[#2F6FED]">{course.progress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#2F6FED] to-[#22C55E] rounded-full" style={{ width: `${course.progress}%` }}></div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => onShowToast && onShowToast(`Module ouvert : ${course.title}`, 'info')}
+                    className="w-full py-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-[#2F6FED] text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    Ouvrir le cours →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // 20. COMPOSANT SIMULATIONS BAC (ExamsView)
+    function ExamsView({ onShowToast }) {
+      const exams = [
+        { id: 1, title: 'Baccalauréat Général Blanc — Session 2025', subject: 'Mathématiques', serie: 'Série C', duration: '4 Heures', status: 'Terminé', score: '17.5 / 20', badgeColor: 'bg-emerald-100 text-emerald-700' },
+        { id: 2, title: 'Épreuve Nationale Officielle Bac Congo 2024', subject: 'Physique-Chimie', serie: 'Séries C & D', duration: '3h30', status: 'À faire', score: 'Non noté', badgeColor: 'bg-amber-100 text-amber-700' },
+        { id: 3, title: 'Baccalauréat Blanc Inter-Lycées Brazzaville 2024', subject: 'SVT', serie: 'Série D', duration: '3 Heures', status: 'À faire', score: 'Non noté', badgeColor: 'bg-amber-100 text-amber-700' }
+      ];
+
+      return (
+        <div className="space-y-6 animate-fadeInUp">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#2F6FED] text-xs font-bold mb-2">
+              <span>✍️</span>
+              <span>Annales & Épreuves d'Excellence</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight">
+              Simulations du Baccalauréat
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Entraînez-vous dans les conditions réelles d'examen avec barème officiel.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] rounded-3xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-blue-500/20">
+            <div>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-extrabold uppercase tracking-wider mb-2 inline-block">Prochain Bac Blanc National</span>
+              <h3 className="text-xl font-black">Simulation Mathématiques Série C & D</h3>
+              <p className="text-xs text-blue-100 mt-1">Samedi à 08h00 • Épreuve de 4h avec classement national.</p>
+            </div>
+            <button
+              onClick={() => onShowToast && onShowToast('Inscription confirmée !', 'success')}
+              className="px-5 py-3 rounded-xl bg-white text-[#1E4FD1] text-xs font-bold hover:bg-blue-50 transition-colors shrink-0 cursor-pointer"
+            >
+              S'inscrire à l'épreuve
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {exams.map((exam) => (
+              <div key={exam.id} className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#2F6FED] flex items-center justify-center text-xl font-bold shrink-0">📝</div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-[#2F6FED]">{exam.subject}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-xs font-semibold text-slate-500">{exam.serie}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-xs text-slate-400">{exam.duration}</span>
+                    </div>
+                    <h4 className="text-sm sm:text-base font-extrabold text-[#1A1D29] mb-1">{exam.title}</h4>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-end">
+                  <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${exam.badgeColor}`}>
+                    {exam.status} : {exam.score}
+                  </span>
+                  <button
+                    onClick={() => onShowToast && onShowToast(`Ouverture de l'épreuve : ${exam.title}`, 'info')}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs font-bold shadow-xs cursor-pointer"
+                  >
+                    {exam.status === 'Terminé' ? 'Revoir la copie' : 'Lancer l\'épreuve'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // 21. COMPOSANT ABONNEMENT EN FCFA (SubscriptionView)
+    function SubscriptionView({ user, onShowToast }) {
+      const [selectedPlan, setSelectedPlan] = useState('monthly');
+      const [paymentMethod, setPaymentMethod] = useState('airtel');
+      const [phoneNumber, setPhoneNumber] = useState('06 912 34 56');
+      const [isProcessing, setIsProcessing] = useState(false);
+
+      const plans = [
+        { id: 'monthly', name: 'Pass Mensuel Pro', price: '15 000 FCFA', period: '/mois', popular: true, desc: 'Entraînement mois par mois sans engagement.', features: ['Accès illimité aux 5 000 exercices', 'Simulations du Bac corrigées', 'Tuteur IA 24h/24'] },
+        { id: 'quarterly', name: 'Pass Trimestriel', price: '39 000 FCFA', period: '/trimestre', saving: 'Économie de 13%', desc: 'Idéal pour un trimestre scolaire complet.', features: ['Tous les avantages Mensuels', '2 Bac Blancs intensifs', 'Fiches imprimables PDF'] },
+        { id: 'annual', name: 'Pass Annuel Excellence', price: '120 000 FCFA', period: '/an', saving: '33% d\'économie', desc: 'Préparation complète jusqu\'au Bac.', features: ['Tout inclus jusqu\'au Bac', 'Masterclass vidéo majors', 'Garantie mention'] }
+      ];
+
+      const paymentProviders = [
+        { id: 'airtel', name: 'Airtel Money Congo', code: '*128#', icon: '🔴' },
+        { id: 'mtn', name: 'MTN Mobile Money Congo', code: '*105#', icon: '🟡' },
+        { id: 'card', name: 'Carte Bancaire (Visa / Mastercard)', code: '3D Secure', icon: '💳' }
+      ];
+
+      const invoices = [
+        { id: 'FAC-2026-0917', date: '17 Septembre 2026', amount: '15 000 FCFA', status: 'Payée', method: 'Airtel Money', period: '17 Sep 2026 - 17 Oct 2026' },
+        { id: 'FAC-2026-0817', date: '17 Août 2026', amount: '15 000 FCFA', status: 'Payée', method: 'MTN MoMo', period: '17 Aoû 2026 - 17 Sep 2026' }
+      ];
+
+      const handleRenew = (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+        setTimeout(() => {
+          setIsProcessing(false);
+          if (onShowToast) onShowToast('Paiement simulé avec succès ! Votre abonnement est renouvelé.', 'success');
+        }, 1000);
+      };
+
+      return (
+        <div className="space-y-8 animate-fadeInUp">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#2F6FED] text-xs font-bold mb-2">
+              <span>💳</span>
+              <span>Facturation & Abonnements</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight">
+              Mon Abonnement E-School Pro
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Gérez votre formule, vos paiements Mobile Money et téléchargez vos quittances en FCFA.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-[#1A1D29] via-[#212638] to-[#1E4FD1] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Abonnement Actif
+                  </span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight">Formule E-School Pro</h3>
+                <p className="text-xs sm:text-sm text-slate-300 mt-1">Titulaire : <strong>{user.name}</strong> • {user.grade} • Valable jusqu'au <span className="text-emerald-400 font-bold">{user.expiresAt || '17 Octobre 2026'}</span>.</p>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-right">
+                <div className="text-[11px] text-slate-300">Tarif Étudiant</div>
+                <div className="text-2xl font-black text-white">15 000 FCFA<span className="text-xs font-normal">/mois</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {plans.map((plan) => {
+              const isSelected = selectedPlan === plan.id;
+              return (
+                <div
+                  key={plan.id}
+                  onClick={() => setSelectedPlan(plan.id)}
+                  className={`rounded-3xl p-6 transition-all duration-200 cursor-pointer relative flex flex-col justify-between ${
+                    isSelected ? 'bg-white border-2 border-[#2F6FED] shadow-xl' : 'bg-white border border-slate-200 shadow-xs'
+                  }`}
+                >
+                  <div>
+                    <h4 className="text-lg font-extrabold text-[#1A1D29] mb-1">{plan.name}</h4>
+                    <p className="text-xs text-slate-500 mb-4">{plan.desc}</p>
+                    <div className="text-2xl font-black text-[#1A1D29] mb-4">{plan.price} <span className="text-xs text-slate-400 font-normal">{plan.period}</span></div>
+                    <ul className="space-y-2 mb-6">
+                      {plan.features.map((f, i) => (
+                        <li key={i} className="text-xs text-slate-600 flex items-center gap-2">
+                          <span className="text-[#22C55E] font-bold">✓</span> {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <button className={`w-full py-2.5 rounded-xl text-xs font-bold ${isSelected ? 'bg-[#2F6FED] text-white' : 'bg-slate-100 text-slate-700'}`}>
+                    {isSelected ? 'Sélectionné' : 'Choisir ce Pass'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+            <h3 className="text-lg font-black text-[#1A1D29] mb-4">Paiement Mobile Money Congo</h3>
+            <form onSubmit={handleRenew} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {paymentProviders.map((p) => (
+                  <div
+                    key={p.id}
+                    onClick={() => setPaymentMethod(p.id)}
+                    className={`p-4 rounded-2xl border-2 cursor-pointer flex items-center gap-3 ${
+                      paymentMethod === p.id ? 'border-[#2F6FED] bg-blue-50/50' : 'border-slate-200'
+                    }`}
+                  >
+                    <span className="text-2xl">{p.icon}</span>
+                    <div>
+                      <div className="text-xs font-bold text-[#1A1D29]">{p.name}</div>
+                      <div className="text-[10px] text-slate-400">{p.code}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">Numéro Mobile Money Débiteur</label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+                <div className="flex flex-col justify-end">
+                  <button
+                    type="submit"
+                    disabled={isProcessing}
+                    className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs sm:text-sm font-bold shadow-md cursor-pointer"
+                  >
+                    {isProcessing ? 'Validation en cours...' : 'Renouveler mon abonnement →'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+            <h3 className="text-lg font-black text-[#1A1D29] mb-4">Historique des Quittances Scolaires</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-400 font-bold uppercase">
+                    <th className="pb-3">Facture</th>
+                    <th className="pb-3">Période</th>
+                    <th className="pb-3">Montant</th>
+                    <th className="pb-3">Mode</th>
+                    <th className="pb-3 text-right">Reçu</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {invoices.map((inv) => (
+                    <tr key={inv.id}>
+                      <td className="py-3 font-bold text-[#1A1D29]">{inv.id}</td>
+                      <td className="py-3 text-slate-600">{inv.period}</td>
+                      <td className="py-3 font-extrabold text-[#1E4FD1]">{inv.amount}</td>
+                      <td className="py-3 text-slate-500">{inv.method}</td>
+                      <td className="py-3 text-right">
+                        <button
+                          onClick={() => onShowToast && onShowToast(`Téléchargement de la quittance ${inv.id}`, 'info')}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold cursor-pointer hover:bg-slate-200"
+                        >
+                          Télécharger PDF
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 22. COMPOSANT PROFIL & PARAMÈTRES (ProfileView)
+    function ProfileView({ user, onUpdateUser, onShowToast }) {
+      const [profile, setProfile] = useState({
+        name: user.name || 'Marcel Junior',
+        email: user.email || 'marcel.junior@eschool.cg',
+        phone: user.phone || '+242 06 912 34 56',
+        school: user.school || 'Lycée Chaminade',
+        city: user.city || 'Brazzaville 🇨🇬',
+        grade: user.grade || 'Terminale C'
+      });
+
+      const handleSave = (e) => {
+        e.preventDefault();
+        if (onUpdateUser) onUpdateUser(profile);
+        if (onShowToast) onShowToast('Profil mis à jour avec succès !', 'success');
+      };
+
+      return (
+        <div className="space-y-8 animate-fadeInUp max-w-4xl">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#2F6FED] text-xs font-bold mb-2">
+              <span>⚙️</span>
+              <span>Compte & Préférences</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight">
+              Paramètres du Profil Élève
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Personnalisez vos coordonnées, votre lycée et vos préférences d'alertes WhatsApp.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
+            <form onSubmit={handleSave} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">Nom & Prénom</label>
+                  <input
+                    type="text"
+                    value={profile.name}
+                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">Email</label>
+                  <input
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">WhatsApp / Téléphone</label>
+                  <input
+                    type="tel"
+                    value={profile.phone}
+                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">Lycée / Établissement</label>
+                  <input
+                    type="text"
+                    value={profile.school}
+                    onChange={(e) => setProfile({ ...profile, school: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">Classe / Série</label>
+                  <input
+                    type="text"
+                    value={profile.grade}
+                    onChange={(e) => setProfile({ ...profile, grade: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#1A1D29] mb-1.5 uppercase">Ville</label>
+                  <input
+                    type="text"
+                    value={profile.city}
+                    onChange={(e) => setProfile({ ...profile, city: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3">
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-[#2F6FED] text-white text-xs sm:text-sm font-bold shadow-md cursor-pointer"
+                >
+                  Enregistrer les modifications
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // 23. COMPOSANT ESPACE DE TRAVAIL CONNECTÉ DÉDIÉ (AppDashboard)
+    function AppDashboard({ user, onLogout, onViewLanding, onUpdateUser, onShowToast }) {
+      const [activeSidebarTab, setActiveSidebarTab] = useState('dashboard');
+      const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+      return (
+        <div className="min-h-screen bg-[#F7F8FA] text-[#1A1D29] font-sans antialiased selection:bg-blue-100 selection:text-[#2F6FED]">
+          <AppSidebar
+            activeTab={activeSidebarTab}
+            setActiveTab={setActiveSidebarTab}
+            user={user}
+            onLogout={onLogout}
+            onViewLanding={onViewLanding}
+            isMobileOpen={isMobileOpen}
+            setIsMobileOpen={setIsMobileOpen}
+          />
+
+          <div className="lg:pl-72 flex flex-col min-h-screen">
+            <AppTopBar
+              user={user}
+              onOpenMobileMenu={() => setIsMobileOpen(true)}
+              onSelectTab={setActiveSidebarTab}
+              onLogout={onLogout}
+            />
+
+            <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+              {activeSidebarTab === 'dashboard' && (
+                <div className="space-y-7 animate-fadeInUp">
+                  <div className="rounded-3xl bg-gradient-to-r from-white via-blue-50/40 to-indigo-50/40 border border-slate-200/80 p-6 sm:p-7 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+                    <div className="relative z-10">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E8F8EE] text-[#22C55E] text-xs font-bold mb-2">
+                        <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+                        <span>Session d'étude active</span>
+                      </div>
+                      <h1 className="text-2xl sm:text-3xl font-black text-[#1A1D29] tracking-tight">
+                        Bonjour {user.name} 👋
+                      </h1>
+                      <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl leading-relaxed">
+                        Vous êtes en <strong>{user.grade}</strong> ({user.school || 'Lycée Chaminade'}, {user.city}). Votre régularité de travail est excellente : continuez ainsi pour viser la mention Très Bien au Bac !
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 flex items-center gap-3 self-stretch md:self-auto justify-between md:justify-end">
+                      <div className="bg-white p-3 rounded-2xl border border-slate-200/80 text-center shadow-xs">
+                        <div className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Série en cours</div>
+                        <div className="text-lg font-black text-[#2F6FED]">🔥 14 jours</div>
+                      </div>
+
+                      <button
+                        onClick={() => setActiveSidebarTab('exams')}
+                        className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 btn-hover cursor-pointer whitespace-nowrap"
+                      >
+                        Simuler un Bac Blanc →
+                      </button>
+                    </div>
+                  </div>
+
+                  <DashboardHeader />
+                  <StatCards />
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-8">
+                      <SubjectChart />
+                    </div>
+                    <div className="lg:col-span-4">
+                      <QuestionDonut />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-8">
+                      <RecentExamsTable />
+                    </div>
+                    <div className="lg:col-span-4">
+                      <TopPerformers />
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl bg-gradient-to-r from-blue-50 via-white to-indigo-50 border border-blue-100/90 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-11 h-11 rounded-2xl bg-[#2F6FED] text-white flex items-center justify-center font-bold text-lg shadow-sm shadow-blue-500/30 shrink-0">
+                        ⚡
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-[#1A1D29]">
+                          Abonnement Actif : Accès Scolaire Illimité E-School Pro
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          Formule à 15 000 FCFA/mois • Prochaine échéance le {user.expiresAt || '17 Octobre 2026'}.
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setActiveSidebarTab('subscription')}
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 btn-hover cursor-pointer"
+                    >
+                      Gérer mon abonnement FCFA
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {activeSidebarTab === 'courses' && (
+                <CoursesView onShowToast={onShowToast} />
+              )}
+
+              {activeSidebarTab === 'exams' && (
+                <ExamsView onShowToast={onShowToast} />
+              )}
+
+              {activeSidebarTab === 'subscription' && (
+                <SubscriptionView user={user} onShowToast={onShowToast} />
+              )}
+
+              {activeSidebarTab === 'settings' && (
+                <ProfileView
+                  user={user}
+                  onUpdateUser={onUpdateUser}
+                  onShowToast={onShowToast}
+                />
+              )}
+            </main>
+
+            <footer className="py-5 px-6 border-t border-slate-200/60 text-center text-xs text-slate-400">
+              E-School Technologies Africa • Espace d'Excellence Éducative • République du Congo 🇨🇬
+            </footer>
+          </div>
+        </div>
+      );
+    }
+
+    // 24. COMPOSANT RACINE APP AVEC ROUTAGE COMPLET D'ÉTAT SAAS
+    function App() {
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'login' | 'signup' | 'app-dashboard'
+      const [auth, setAuth] = useState({
+        isAuthenticated: false,
+        user: {
+          name: 'Marcel Junior',
+          email: 'marcel.junior@eschool.cg',
+          phone: '+242 06 912 34 56',
+          grade: 'Terminale C',
+          city: 'Brazzaville 🇨🇬',
+          school: 'Lycée Chaminade',
+          avatar: 'assets/images/marcel-junior.jpg',
+          plan: 'Pro (15 000 FCFA/mois)',
+          expiresAt: '17 Octobre 2026'
+        }
+      });
+      const [toast, setToast] = useState(null);
+
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+      };
+
+      const handleLoginSuccess = (userData) => {
+        setAuth(prev => ({
+          isAuthenticated: true,
+          user: { ...prev.user, ...userData }
+        }));
+        showToast(`Connexion réussie ! Bienvenue dans votre espace, ${userData.name || 'Marcel'}.`, 'success');
+        setCurrentView('app-dashboard');
+      };
+
+      const handleSignupSuccess = (userData) => {
+        setAuth({
+          isAuthenticated: true,
+          user: {
+            ...auth.user,
+            ...userData
+          }
+        });
+        showToast(`Compte créé avec succès ! Bienvenue sur E-School, ${userData.name}.`, 'success');
+        setCurrentView('app-dashboard');
+      };
+
+      const handleUpdateUser = (updatedData) => {
+        setAuth(prev => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            ...updatedData
+          }
+        }));
+      };
+
+      const handleLogout = () => {
+        setAuth(prev => ({
+          ...prev,
+          isAuthenticated: false
+        }));
+        showToast('Vous avez été déconnecté avec succès.', 'info');
+        setCurrentView('landing');
+      };
+
+      React.useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, [currentView]);
+
+      return (
+        <div className="min-h-screen bg-[#F7F8FA] text-[#1A1D29] font-sans antialiased flex flex-col selection:bg-blue-100 selection:text-[#2F6FED]">
+          
+          {toast && (
+            <div className="fixed bottom-6 right-6 z-50 animate-fadeInUp">
+              <div className="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-300/40 text-xs sm:text-sm font-bold text-[#1A1D29]">
+                <span className={`w-2.5 h-2.5 rounded-full ${toast.type === 'error' ? 'bg-red-500' : toast.type === 'info' ? 'bg-blue-500' : 'bg-[#22C55E]'} animate-pulse`}></span>
+                <span>{toast.message}</span>
+                <button
+                  onClick={() => setToast(null)}
+                  className="ml-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* VUE 1 : PAGE DE CONNEXION */}
+          {currentView === 'login' && (
+            <LoginPage
+              onNavigate={(view) => setCurrentView(view)}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          )}
+
+          {/* VUE 2 : PAGE D'INSCRIPTION ÉLÈVE */}
+          {currentView === 'signup' && (
+            <SignupPage
+              onNavigate={(view) => setCurrentView(view)}
+              onSignupSuccess={handleSignupSuccess}
+            />
+          )}
+
+          {/* VUE 3 : ESPACE CONNECTÉ APPLICATIF DÉDIÉ (AVEC SIDEBAR) */}
+          {currentView === 'app-dashboard' && (
+            <AppDashboard
+              user={auth.user}
+              onLogout={handleLogout}
+              onViewLanding={() => setCurrentView('landing')}
+              onUpdateUser={handleUpdateUser}
+              onShowToast={showToast}
+            />
+          )}
+
+          {/* VUE 4 : LANDING PAGE PUBLIQUE MARKETING */}
+          {currentView === 'landing' && (
+            <>
+              <Header
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onNavigate={(view) => setCurrentView(view)}
+                auth={auth}
+                onLogout={handleLogout}
+              />
+
+              {auth.isAuthenticated && (
+                <div className="bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white py-2.5 px-4 shadow-sm animate-fadeInUp">
+                  <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] animate-pulse"></span>
+                      <span>
+                        Session active : <strong className="font-bold">{auth.user.name}</strong> ({auth.user.grade} • {auth.user.city})
+                      </span>
+                      <span className="hidden md:inline text-blue-100">• Formule Pro active (15 000 FCFA/mois)</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setCurrentView('app-dashboard')}
+                        className="underline hover:text-blue-100 font-extrabold cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>Accéder à mon Espace de Travail</span>
+                        <span>→</span>
+                      </button>
+                      <span>•</span>
+                      <button
+                        onClick={handleLogout}
+                        className="hover:text-red-200 font-semibold cursor-pointer underline"
+                      >
+                        Se déconnecter
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 1. Hero Section */}
+              <Hero />
+
+              {/* 2. Vitrine Tableau de Bord (Dashboard Interactif Cognify) */}
+              <section id="dashboard-section" className="relative scroll-mt-24 pb-16">
+                <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+                  <DashboardHeader />
+                  <StatCards />
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-7">
+                    <div className="lg:col-span-8">
+                      <SubjectChart />
+                    </div>
+                    <div className="lg:col-span-4">
+                      <QuestionDonut />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                    <div className="lg:col-span-8">
+                      <RecentExamsTable />
+                    </div>
+                    <div className="lg:col-span-4">
+                      <TopPerformers />
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl bg-gradient-to-r from-blue-50 via-white to-indigo-50 border border-blue-100/80 p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-[#2F6FED] text-white flex items-center justify-center font-bold text-base shadow-sm shadow-blue-500/30">
+                        ⚡
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-[#1A1D29]">
+                          Accès Scolaire Illimité E-School Pro
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          Accédez à plus de 5 000 exercices corrigés, simulations du Bac et fiches de synthèse.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 self-stretch sm:self-auto justify-between sm:justify-end">
+                      <div className="text-right">
+                        <div className="text-xs text-slate-400 font-medium">Tarif Étudiant</div>
+                        <div className="text-base font-extrabold text-[#1E4FD1]">
+                          15 000 FCFA <span className="text-xs font-normal text-slate-500">/mois</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (auth.isAuthenticated) {
+                            setCurrentView('app-dashboard');
+                          } else {
+                            const el = document.getElementById('pricing-section');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2F6FED] to-[#1E4FD1] text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 btn-hover cursor-pointer"
+                      >
+                        {auth.isAuthenticated ? 'Mon Espace Pro' : 'Gérer mon abonnement'}
+                      </button>
+                    </div>
+                  </div>
+                </main>
+              </section>
+
+              {/* 3. Section Fonctionnalités Clés */}
+              <Features />
+
+              {/* 4. Section Tarifs en FCFA */}
+              <Pricing />
+
+              {/* 5. Section Témoignages & Bacheliers */}
+              <Testimonials />
+
+              {/* 6. Section FAQ Interactive */}
+              <FAQ />
+
+              {/* 7. Footer Complet & CTA de Clôture */}
+              <Footer />
+            </>
+          )}
+
+        </div>
+      );
+    }
+
+    // Montage
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
